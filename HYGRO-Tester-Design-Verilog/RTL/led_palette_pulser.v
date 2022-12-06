@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- MIT License
 --
--- Copyright (c) 2020 Timothy Stotts
+-- Copyright (c) 2020,2022 Timothy Stotts
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 --
 -- \brief A simple pulser to generate palette values for \ref led_pwm_driver.v .
 ------------------------------------------------------------------------------*/
-//Recursive Moore Machine-------------------------------------------------------
+//D-FF based LED pulsing--------------------------------------------------------
 //Part 1: Module header:--------------------------------------------------------
 module led_palette_pulser(i_clk, i_srst, o_color_led_red_value,
 	o_color_led_green_value, o_color_led_blue_value, o_basic_led_lumin_value,
@@ -121,14 +121,18 @@ clock_enable_divider #(
 	.i_ce_mhz(1'b1)
 	);
 
-/* Tester FSM registered outputs to multicolor LED 0:3 to indicate the
-   execution state of \ref p_tester_fsm_state and \ref p_tester_comb and also
-   the status register Activity and Inactivity. Also displayed on LED 4
-   is the AWAKE state of the PMOD ACL2; and on LED 6,7 the Switch 0
-   and Switch 1 debounced positions. */
-assign o_color_led_red_value = {s_ld3_red_value, s_ld2_red_value, s_ld1_red_value, s_ld0_red_value};
-assign o_color_led_green_value = {s_ld3_green_value, s_ld2_green_value, s_ld1_green_value, s_ld0_green_value};
-assign o_color_led_blue_value = {s_ld3_blue_value, s_ld2_blue_value, s_ld1_blue_value, s_ld0_blue_value};
+generate
+	if (parm_color_led_count == 2) begin
+		assign o_color_led_red_value = {s_ld1_red_value, s_ld0_red_value};
+		assign o_color_led_green_value = {s_ld1_green_value, s_ld0_green_value};
+		assign o_color_led_blue_value = {s_ld1_blue_value, s_ld0_blue_value};
+	end else begin
+		assign o_color_led_red_value = {s_ld3_red_value, s_ld2_red_value, s_ld1_red_value, s_ld0_red_value};
+		assign o_color_led_green_value = {s_ld3_green_value, s_ld2_green_value, s_ld1_green_value, s_ld0_green_value};
+		assign o_color_led_blue_value = {s_ld3_blue_value, s_ld2_blue_value, s_ld1_blue_value, s_ld0_blue_value};
+	end
+endgenerate
+
 assign o_basic_led_lumin_value = {s_ld7_basic_value, s_ld6_basic_value, s_ld5_basic_value, s_ld4_basic_value};
 
 assign s_ld0_red_value = {s_ld0_red_pulse, 2'b11};
@@ -206,98 +210,164 @@ begin: p_tester_led_pulse
 	end
 end
 
-always @(posedge i_clk)
-begin: p_tester_led_display
-	// If OP NONE mode, turn LED0 red,
-	// else if DISPLAY BOTH FARH, turn LED0 blue,
-	// else if DISPLAY BOTH CELCIUS, turn LED0 green,
-	// else turn LED0 low white
-	if (i_hygro_op_mode == OP_NONE) begin
-		// LED 0 will be red when op mode is NONE
-		s_ld0_red_pulse <= s_ld0_led_pulse;
-		s_ld0_green_pulse <= 6'b000001;
-		s_ld0_blue_pulse <= 6'b000001;
-	end else if (i_hygro_display_mode == DISP_BOTH_FARH) begin
-		// LED 0 will be green when tester is running.
-		s_ld0_red_pulse <= 6'b000001;
-		s_ld0_green_pulse <= 6'b000001;
-		s_ld0_blue_pulse <= s_ld0_led_pulse;
-	end else if (i_hygro_display_mode == DISP_BOTH_CELCIUS) begin
-		// LED 0 will be blue when tester is not working at all.
-		s_ld0_red_pulse <= 6'b000001;
-		s_ld0_green_pulse <= s_ld0_led_pulse;
-		s_ld0_blue_pulse <= 6'b000001;
-	end else begin
-		s_ld0_red_pulse <= 6'b000001;
-		s_ld0_green_pulse <= 6'b000001;
-		s_ld0_blue_pulse <= 6'b000001;
-	end
+generate
+	if (parm_color_led_count == 2) begin
+		always @(posedge i_clk)
+		begin: p_tester_led_display
+			// If OP NONE mode, turn LED0 red,
+			// else if DISPLAY BOTH FARH, turn LED0 blue,
+			// else if DISPLAY BOTH CELCIUS, turn LED0 green,
+			// else turn LED0 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				// LED 0 will be red when op mode is NONE
+				s_ld0_red_pulse <= s_ld0_led_pulse;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_BOTH_FARH) begin
+				// LED 0 will be green when tester is running.
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= s_ld0_led_pulse;
+			end else if (i_hygro_display_mode == DISP_BOTH_CELCIUS) begin
+				// LED 0 will be blue when tester is not working at all.
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= s_ld0_led_pulse;
+				s_ld0_blue_pulse <= 6'b000001;
+			end else begin
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= 6'b000001;
+			end
 
-	// If OP NONE mode, turn LED1 red,
-	// else if DISPLAY ONLY TEMP C, turn LED1 green,
-	// else turn LED1 low white
-	if (i_hygro_op_mode == OP_NONE) begin
-		s_ld1_red_pulse <= s_ld1_led_pulse;
-		s_ld1_green_pulse <= 6'b000001;
-		s_ld1_blue_pulse <= 6'b000001;
-	end else if (i_hygro_display_mode == DISP_ONLY_TEMP_C) begin
-		s_ld1_red_pulse <= 6'b000001;
-		s_ld1_green_pulse <= s_ld1_led_pulse;
-		s_ld1_blue_pulse <= 6'b000001;
-	end else begin
-		s_ld1_red_pulse <= 6'b000001;
-		s_ld1_green_pulse <= 6'b000001;
-		s_ld1_blue_pulse <= 6'h000001;
-	end
+			// If OP NONE mode, turn LED1 red,
+			// else if DISPLAY ONLY TEMP C, turn LED1 green,
+			// else if DISP_ONLY_TEMP_F, turn lED1 blue,
+			// else if DISP_ONLY_HUMID, turn LED1 _____ (purple?),
+			// else turn LED1 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				s_ld1_red_pulse <= s_ld1_led_pulse;
+				s_ld1_green_pulse <= 6'b000001;
+				s_ld1_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_ONLY_TEMP_C) begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= s_ld1_led_pulse;
+				s_ld1_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_ONLY_TEMP_F) begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= 6'b000001;
+				s_ld1_blue_pulse <= s_ld1_led_pulse;
+			end else if (i_hygro_display_mode == DISP_ONLY_HUMID) begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= s_ld1_led_pulse;
+				s_ld1_blue_pulse <= s_ld1_led_pulse;
+			end else begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= 6'b000001;
+				s_ld1_blue_pulse <= 6'h000001;
+			end
+		end
+	end else if (parm_color_led_count == 4) begin
+		always @(posedge i_clk)
+		begin: p_tester_led_display
+			// If OP NONE mode, turn LED0 red,
+			// else if DISPLAY BOTH FARH, turn LED0 blue,
+			// else if DISPLAY BOTH CELCIUS, turn LED0 green,
+			// else turn LED0 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				// LED 0 will be red when op mode is NONE
+				s_ld0_red_pulse <= s_ld0_led_pulse;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_BOTH_FARH) begin
+				// LED 0 will be green when tester is running.
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= s_ld0_led_pulse;
+			end else if (i_hygro_display_mode == DISP_BOTH_CELCIUS) begin
+				// LED 0 will be blue when tester is not working at all.
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= s_ld0_led_pulse;
+				s_ld0_blue_pulse <= 6'b000001;
+			end else begin
+				s_ld0_red_pulse <= 6'b000001;
+				s_ld0_green_pulse <= 6'b000001;
+				s_ld0_blue_pulse <= 6'b000001;
+			end
 
-	// If OP NONE mode, turn LED2 red,
-	// else if DISPLAY ONLY TEMP F, turn LED2 blue,
-	// else turn LED2 low white
-	if (i_hygro_op_mode == OP_NONE) begin
-		s_ld2_red_pulse <= s_ld2_led_pulse;
-		s_ld2_green_pulse <= 6'b000001;
-		s_ld2_blue_pulse <= 6'b000001;
-	end else if (i_hygro_display_mode == DISP_ONLY_TEMP_F) begin
-		s_ld2_red_pulse <= 6'b000001;
-		s_ld2_green_pulse <= 6'b000001;
-		s_ld2_blue_pulse <= s_ld2_led_pulse;
-	end else begin
-		s_ld2_red_pulse <= 6'b000001;
-		s_ld2_green_pulse <= 6'b000001;
-		s_ld2_blue_pulse <= 6'b000001;
-	end
+			// If OP NONE mode, turn LED1 red,
+			// else if DISPLAY ONLY TEMP C, turn LED1 green,
+			// else turn LED1 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				s_ld1_red_pulse <= s_ld1_led_pulse;
+				s_ld1_green_pulse <= 6'b000001;
+				s_ld1_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_ONLY_TEMP_C) begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= s_ld1_led_pulse;
+				s_ld1_blue_pulse <= 6'b000001;
+			end else begin
+				s_ld1_red_pulse <= 6'b000001;
+				s_ld1_green_pulse <= 6'b000001;
+				s_ld1_blue_pulse <= 6'h000001;
+			end
 
-	// If OP NONE mode, turn LED3 red,
-	// else if DISPLAY ONLY HUMID, turn LED3 green,
-	// else turn LED3 low white
-	if (i_hygro_op_mode == OP_NONE) begin
-		s_ld3_red_pulse <= s_ld3_led_pulse;
-		s_ld3_green_pulse <= 6'b000001;
-		s_ld3_blue_pulse <= 6'b000001;
-	end else if (i_hygro_display_mode == DISP_ONLY_HUMID) begin
-		s_ld3_red_pulse <= 6'b000001;
-		s_ld3_green_pulse <= s_ld3_led_pulse;
-		s_ld3_blue_pulse <= 6'b000001;
-	end else begin
-		s_ld3_red_pulse <= 6'b000001;
-		s_ld3_green_pulse <= 6'b000001;
-		s_ld3_blue_pulse <= 6'b000001;
-	end
+			// If OP NONE mode, turn LED2 red,
+			// else if DISPLAY ONLY TEMP F, turn LED2 blue,
+			// else turn LED2 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				s_ld2_red_pulse <= s_ld2_led_pulse;
+				s_ld2_green_pulse <= 6'b000001;
+				s_ld2_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_ONLY_TEMP_F) begin
+				s_ld2_red_pulse <= 6'b000001;
+				s_ld2_green_pulse <= 6'b000001;
+				s_ld2_blue_pulse <= s_ld2_led_pulse;
+			end else begin
+				s_ld2_red_pulse <= 6'b000001;
+				s_ld2_green_pulse <= 6'b000001;
+				s_ld2_blue_pulse <= 6'b000001;
+			end
 
-	// If OP NONE mode, turn off the basic LEDs, 4-7
-	// else, turn on the basic LEDs, 4-7.
-	if (i_hygro_op_mode == OP_NONE) begin
-		s_ld4_basic_value <= 8'h00;
-		s_ld5_basic_value <= 8'h00;
-		s_ld6_basic_value <= 8'h00;
-		s_ld7_basic_value <= 8'h00;
-	end else begin
-		s_ld4_basic_value <= 8'hFF;
-		s_ld5_basic_value <= 8'hFF;
-		s_ld6_basic_value <= 8'hFF;
-		s_ld7_basic_value <= 8'hFF;
+			// If OP NONE mode, turn LED3 red,
+			// else if DISPLAY ONLY HUMID, turn LED3 green,
+			// else turn LED3 low white
+			if (i_hygro_op_mode == OP_NONE) begin
+				s_ld3_red_pulse <= s_ld3_led_pulse;
+				s_ld3_green_pulse <= 6'b000001;
+				s_ld3_blue_pulse <= 6'b000001;
+			end else if (i_hygro_display_mode == DISP_ONLY_HUMID) begin
+				s_ld3_red_pulse <= 6'b000001;
+				s_ld3_green_pulse <= s_ld3_led_pulse;
+				s_ld3_blue_pulse <= 6'b000001;
+			end else begin
+				s_ld3_red_pulse <= 6'b000001;
+				s_ld3_green_pulse <= 6'b000001;
+				s_ld3_blue_pulse <= 6'b000001;
+			end
+		end
 	end
-end
+endgenerate
+
+generate
+	if (parm_basic_led_count == 4) begin
+		always @(posedge i_clk)
+		begin: p_tester_basic_leds
+			// If OP NONE mode, turn off the basic LEDs, 4-7
+			// else, turn on the basic LEDs, 4-7.
+			if (i_hygro_op_mode == OP_NONE) begin
+				s_ld4_basic_value <= 8'h00;
+				s_ld5_basic_value <= 8'h00;
+				s_ld6_basic_value <= 8'h00;
+				s_ld7_basic_value <= 8'h00;
+			end else begin
+				s_ld4_basic_value <= 8'hFF;
+				s_ld5_basic_value <= 8'hFF;
+				s_ld6_basic_value <= 8'hFF;
+				s_ld7_basic_value <= 8'hFF;
+			end
+		end
+	end
+endgenerate
 
 always @(posedge i_clk)
 begin: p_tester_7sd_display
