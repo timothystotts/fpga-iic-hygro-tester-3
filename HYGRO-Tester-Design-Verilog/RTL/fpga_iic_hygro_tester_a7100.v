@@ -22,7 +22,7 @@
 -- SOFTWARE.
 ------------------------------------------------------------------------------*/
 /**-----------------------------------------------------------------------------
--- \file fpga_iic_hygro_tester.v
+-- \file fpga_iic_hygro_tester_a7100.v
 --
 -- \brief A FPGA top-level design with the PMOD HYGRO custom driver.
 -- This design operates the HDC1080 by retrieving Temperature and Relative
@@ -32,7 +32,7 @@
 -------------------------------------------------------------------------------*/
 /* FIXME: The design top-level utilizes the default TECHNOLOGY, SLEW, and DRIVE. */
 //Part 1: Module header:--------------------------------------------------------
-module fpga_iic_hygro_tester(
+module fpga_iic_hygro_tester_a7100(
 	/* external clock and active-low reset */
 	CLK100MHZ, i_resetn,
 	/* PMOD HYGRO IIC bus 2-wire */

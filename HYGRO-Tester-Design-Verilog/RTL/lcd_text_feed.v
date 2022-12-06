@@ -76,7 +76,7 @@ reg [(`c_lcd_update_fsm_bits - 1):0] s_lcd_upd_nx_state;
 localparam [(`c_lcd_update_timer_bits - 1):0] c_i_one_ms =
 	parm_fast_simulation ? 2500 : 2500;
 localparam [(`c_lcd_update_timer_bits - 1):0] c_i_subsecond =
-	parm_fast_simulation ? (2500000 / 100 - (2 * c_i_one_ms)) : (2500000 / 5 - (2 * c_i_one_ms));
+	parm_fast_simulation ? (2500000 / 20 - (2 * c_i_one_ms)) : (2500000 / 5 - (2 * c_i_one_ms));
 localparam [(`c_lcd_update_timer_bits - 1):0] c_i_max = c_i_subsecond;
 
 reg [(`c_lcd_update_timer_bits - 1):0] s_i;
@@ -115,7 +115,7 @@ begin: p_fsm_comb_run_display_update
 			o_lcd_wr_text_line1 = 1'b0;
 			o_lcd_wr_text_line2 = 1'b0;
 
-			if (~ i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_CLEAR_DLY;
+			if (! i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_CLEAR_DLY;
 			else s_lcd_upd_nx_state = ST_LCD_CLEAR_RUN;
 		end
 		ST_LCD_CLEAR_DLY: begin /* Now that the Clear command is running,
@@ -143,7 +143,7 @@ begin: p_fsm_comb_run_display_update
 			o_lcd_wr_text_line1 = 1'b1;
 			o_lcd_wr_text_line2 = 1'b0;
 
-			if (~ i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_LINE1_DLY;
+			if (! i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_LINE1_DLY;
 			else s_lcd_upd_nx_state = ST_LCD_LINE1_RUN;
 		end
 		ST_LCD_LINE1_DLY: begin /* Now that the write Line 1 command is running,
@@ -171,7 +171,7 @@ begin: p_fsm_comb_run_display_update
 			o_lcd_wr_text_line1 = 1'b0;
 			o_lcd_wr_text_line2 = 1'b1;
 
-			if (~ i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_LINE2_DLY;
+			if (! i_lcd_command_ready) s_lcd_upd_nx_state = ST_LCD_LINE2_DLY;
 			else s_lcd_upd_nx_state = ST_LCD_LINE2_RUN;
 		end
 		ST_LCD_LINE2_DLY: begin /* Now that the write Line 2 command is running,
