@@ -126,12 +126,12 @@ set_output_delay -clock [get_clocks wiz_20mhz_virt_out] -min -add_delay -0.700 [
 set_output_delay -clock [get_clocks wiz_20mhz_virt_out] -max -add_delay 6.000 [get_ports eo_pmod_cls_sck]
 
 ## Pmod Header JC
-## The inputs of PMOD ACL2 are all synchronized into the design at the 20 MHz MMCM clock.
+## The input of PMOD HYGRO at I2C is synchronized into the design at the 20 MHz MMCM clock.
 ## A virtual clock is used to allow the tool to automatically compute jitter and other metrics.
 set_input_delay -clock [get_clocks wiz_20mhz_virt_in] -min -add_delay 20.200 [get_ports eio_sda]
 set_input_delay -clock [get_clocks wiz_20mhz_virt_in] -max -add_delay 30.400 [get_ports eio_sda]
 
-## The output of PMOD ACL2 at SPI is synchronized out of the design at the MMCM 20 MHz clock.
+## The outputs of PMOD HYGRO at I2C are synchronized out of the design at the MMCM 20 MHz clock.
 ## A virtual clock is used to allow the tool to automatically compute jitter and other metrics.
 set_output_delay -clock [get_clocks wiz_20mhz_virt_out] -min -add_delay -0.700 [get_ports eo_scl]
 set_output_delay -clock [get_clocks wiz_20mhz_virt_out] -max -add_delay 6.000 [get_ports eo_scl]
