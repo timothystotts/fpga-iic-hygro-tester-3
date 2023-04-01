@@ -22,8 +22,9 @@
 ## SOFTWARE.
 ##------------------------------------------------------------------------------
 
-## This file is a general .xdc for the Arty S7-25 Rev. E, specific to the HYGRO Tester clocking.
-## Source originally provided by Digilent Inc. on GitHub.
+## This file is a synthesis and implementation .xdc for the  Arty S7-25 Rev. E,
+## specific to the HYGRO Tester clocking. Source originally provided by Digilent
+## Inc. on GitHub.
 
 ## WARNING:
 ## Note that all input and output delays are ballpark values and are not representative
@@ -48,7 +49,7 @@ create_generated_clock -name genclk625khz -source [get_pins MMCME2_BASE_inst/CLK
 create_generated_clock -name genclk400khz -source [get_pins MMCME2_BASE_inst/CLKOUT0] -divide_by 50 [get_pins u_pmod_hygro_i2c_solo/u_i2c_4x_clock_divider/s_clk_out_reg/Q]
 create_generated_clock -name genclk100khz -source [get_pins MMCME2_BASE_inst/CLKOUT0] -divide_by 200 [get_pins u_pmod_hygro_i2c_solo/u_i2c_1x_clock_divider/s_clk_out_reg/Q]
 # The Seven Segment Display digit multiplexor clock is actually 100 Hz, but we
-# overconstrain at 10000 Hz as Vivado cannot # process a 100 Hz constraint.
+# overconstrain at 10000 Hz as Vivado cannot process a 100 Hz constraint.
 # The actual clock rate of 100 Hz is too low of a speed for Vivado to process.
 create_generated_clock -name clk100hz_ssd -source [get_pins MMCME2_BASE_inst/CLKOUT0] -divide_by 2000 [get_pins u_one_pmod_ssd_display/u_pmod_ssd_out/u_clock_divider/s_clk_out_reg/Q]
 
