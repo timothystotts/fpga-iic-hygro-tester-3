@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- MIT License
 --
--- Copyright (c) 2020 Timothy Stotts
+-- Copyright (c) 2020,2023 Timothy Stotts
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
  * Timothy Stotts (timothystotts08@gmail.com)
  *
  * @copyright
- * (c) 2020,2023 Copyright Timothy Stotts
+ * Copyright (c) 2020,2023 Timothy Stotts
  *
  * This program is free software; distributed under the terms of the MIT
  * License.
@@ -451,7 +451,7 @@ int main()
 				Experiment_SetLedUpdate(&experiData, 0, 16, 16, 16);
 				Experiment_SetLedUpdate(&experiData, 1, 16, 16, 16);
 				Experiment_SetLedUpdate(&experiData, 2, 16, 16, 16);
-				Experiment_SetLedUpdate(&experiData, 3, 128, 16, 0);
+				Experiment_SetLedUpdate(&experiData, 3, 0, 200, 0);
 				break;
 			default:
 				strcpy(experiData.szInfo1, "Idle. Press");
