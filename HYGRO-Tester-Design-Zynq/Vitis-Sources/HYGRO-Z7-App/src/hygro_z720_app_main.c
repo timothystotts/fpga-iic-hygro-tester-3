@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- MIT License
 --
--- Copyright (c) 2020 Timothy Stotts
+-- Copyright (c) 2020,2023 Timothy Stotts
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
  * Timothy Stotts (timothystotts08@gmail.com)
  *
  * @copyright
- * (c) 2020 Copyright Timothy Stotts
+ * Copyright (c) 2020,2023 Timothy Stotts
  *
  * This program is free software; distributed under the terms of the MIT
  * License.
@@ -445,7 +445,7 @@ int main()
 				snprintf(experiData.szInfo2, sizeof(experiData.szInfo2),
 						"Humid: % 3.4f%%", experiData.hum_perrh);
 				Experiment_SetLedUpdate(&experiData, 5, 0, 0, 0);
-				Experiment_SetLedUpdate(&experiData, 6, 128, 16, 0x00);
+				Experiment_SetLedUpdate(&experiData, 6, 128, 0, 128);
 				break;
 			default:
 				strcpy(experiData.szInfo1, "Idle. Press");
