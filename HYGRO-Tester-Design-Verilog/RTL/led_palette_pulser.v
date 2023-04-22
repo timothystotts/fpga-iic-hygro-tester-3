@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- MIT License
 --
--- Copyright (c) 2020,2022 Timothy Stotts
+-- Copyright (c) 2020,2022-2023 Timothy Stotts
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -257,8 +257,8 @@ generate
 				s_ld1_green_pulse <= 6'b000001;
 				s_ld1_blue_pulse <= s_ld1_led_pulse;
 			end else if (i_hygro_display_mode == DISP_ONLY_HUMID) begin
-				s_ld1_red_pulse <= 6'b000001;
-				s_ld1_green_pulse <= s_ld1_led_pulse;
+				s_ld1_red_pulse <= s_ld1_led_pulse;
+				s_ld1_green_pulse <= 6'b000001;
 				s_ld1_blue_pulse <= s_ld1_led_pulse;
 			end else begin
 				s_ld1_red_pulse <= 6'b000001;
