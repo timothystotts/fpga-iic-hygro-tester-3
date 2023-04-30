@@ -49,7 +49,7 @@ respectively, noting that the Arty A7 example will require modification to fit
 within the smaller equivalent device.
 
 The folder HYGRO-Tester-Design-MB-A7 contains a Xilinx Vivado IP Integrator plus
-Xilinx Vitis design. A Microblaze soft CPU is instantiated to talk with board components,
+Xilinx Vitis design. A MicroBlaze soft CPU is instantiated to talk with board components,
 a temperature and relative humidity sensor,
 a 16x2 character LCD peripheral,
 and a two-digit Seven Segment Display.
@@ -82,7 +82,7 @@ and the same temperature/humidity sensor, 16x2 character LCD display, and seven 
 Its functionality is mostly equivalent function to that of the HYGRO-Tester-Design-MB-A7 design,
 but differs in the count of RGB LEDs.
 
-These two groupings of design provide equivalent functionality, excepting that the HDL designs provide
+These four groupings of design provide equivalent functionality, excepting that the HDL design provides
 additional animation effect of the board's three-emitter RGB LEDs.
 
 ### Naming conventions notice
@@ -95,7 +95,7 @@ On a single peripheral bus with two data lines of fixed direction, the usage of 
 "SDO" is dependent on whether the Controller or the Peripheral is the chip being discussed;
 whereas COPI gives the exact direction regardless of which chip is being discussed. The author
 of this website agrees with the open source community that the removal of offensive language from
-standard terminology in engineering is a priority. (Traditional engineernig wording is still used
+standard terminology in engineering is a priority. (Traditional engineering wording is still used
 in design components and sources where the IP vendor chose the name.)
 
 ### Project information document:
@@ -151,5 +151,5 @@ in design components and sources where the IP vendor chose the name.)
 #### Generic Standard SPI Single Chip protocol bus driver, used by the ACL2 driver and the CLS driver
 ![Generic Standard SPI Single Chip bus driver](https://github.com/timothystotts/fpga-iic-hygro-tester-3/blob/main/HYGRO-Tester-Design-Documents/HYGRO-Tester-Design-Diagrams-SPI-generic-FSM.svg)
 
-#### Pmod CLS Standard SPI custom driver FSM for operating the standard SPI driver to send text line refreshes to the ATmega48 microcontroller chip of the Pmod CLS:
+#### Pmod CLS Standard SPI custom driver FSM for operating the standard SPI driver to send text line refreshes to the ATmega48 micro-controller chip of the Pmod CLS:
 ![CLS Custom Driver readings driver FSM](https://github.com/timothystotts/fpga-iic-hygro-tester-3/blob/main/HYGRO-Tester-Design-Documents/HYGRO-Tester-Design-Diagrams-CLS-driver-FSM.svg)
