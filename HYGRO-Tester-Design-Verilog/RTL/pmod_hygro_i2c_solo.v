@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
 -- MIT License
 --
--- Copyright (c) 2019-2020 Timothy Stotts
+-- Copyright (c) 2019-2020,2023 Timothy Stotts
 --
 -- Permission is hereby granted, free of charge, to any person obtaining a copy
 -- of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,15 @@
 --
 -- \description This exercise is based upon Finite State Machines in Hardware:
 -- Theory and Design by Volnei A. Pedroni, Exercise 14.5 for the I2C control
--- of a temperature sensor. The PMOD HYGRO from Digilent Inc is a temperature
--- and relative humidity sensor board with I2C communication protocol.
+-- of a temperature sensor. Figures 14.8, 14.9, 14.10, 14.11, and code listing
+-- of textbook section 14.2.5, were examined and used as a starting point for
+-- the implementation of this I2C driver.
+--
+-- The PMOD HYGRO from Digilent Inc is a temperature and relative humidity
+-- sensor board with I2C communication protocol. Note that the temperature
+-- sensor replies NACK where an error occurs; and this driver does not capture
+-- that functionality. However, the Digilent Analog Discovery 2 was utilized to
+-- spy on the I2C bus and successfully debug this driver.
 ------------------------------------------------------------------------------*/
 //Part 1: Module header:--------------------------------------------------------
 module pmod_hygro_i2c_solo(i_clk, i_rst, i_wr, i_rd, eo_scl, eo_sda_o, ei_sda_i,
