@@ -67,81 +67,81 @@ reg [3:0] so_btns_deb;
 // FSM input signals
 always @(posedge i_clk_mhz)
 begin: p_sync_buttons_input
-	si_buttons_sync <= si_buttons_meta;
-	si_buttons_meta <= ei_buttons;
+    si_buttons_sync <= si_buttons_meta;
+    si_buttons_meta <= ei_buttons;
 end
 
 // FSM Timer (Strategy #1)
 always @(posedge i_clk_mhz)
 begin: p_fsm_timer1
-	if (i_rst_mhz)
-		s_t <= 0;
-	else
-		if (s_pr_state != s_nx_state)
-			s_t <= 0;
-		else if (s_t != c_tmax)
-			s_t <= s_t + 1;
+    if (i_rst_mhz)
+        s_t <= 0;
+    else
+        if (s_pr_state != s_nx_state)
+            s_t <= 0;
+        else if (s_t != c_tmax)
+            s_t <= s_t + 1;
 end
 
 // FSM state register:
 always @(posedge i_clk_mhz)
 begin: p_fsm_state
-	if (i_rst_mhz) begin
-		s_pr_state <= ST_A;
-		si_buttons_prev <= 4'b0000;
-		si_buttons_store <= 4'b0000;
-	end else begin
-		if ((s_nx_state == ST_C) && (s_pr_state == ST_B))
-			si_buttons_store <= si_buttons_prev;
+    if (i_rst_mhz) begin
+        s_pr_state <= ST_A;
+        si_buttons_prev <= 4'b0000;
+        si_buttons_store <= 4'b0000;
+    end else begin
+        if ((s_nx_state == ST_C) && (s_pr_state == ST_B))
+            si_buttons_store <= si_buttons_prev;
 
-		si_buttons_prev <= si_buttons_sync;
+        si_buttons_prev <= si_buttons_sync;
 
-		s_pr_state <= s_nx_state;
-	end
+        s_pr_state <= s_nx_state;
+    end
 end
 
 // FSM combinational logic:
 always @(s_pr_state, s_t, si_buttons_sync, si_buttons_prev,
-	si_buttons_store)
+    si_buttons_store)
 begin: p_fsm_comb
-	case (s_pr_state)
-		ST_B: begin
-			so_btns_deb <= 4'b0000;
-			if (si_buttons_sync != si_buttons_prev)
-				s_nx_state <= ST_A;
-			else if (s_t == c_T - 2)
-				s_nx_state <= ST_C;
-			else
-				s_nx_state <= ST_B;
-		end
-		ST_C: begin
-			so_btns_deb <= si_buttons_store;
-			if (si_buttons_sync != si_buttons_store)
-				s_nx_state <= ST_D;
-			else
-				s_nx_state <= ST_C;
-		end
-		ST_D: begin
-			so_btns_deb <= si_buttons_store;
-			if (si_buttons_sync == si_buttons_store)
-				s_nx_state <= ST_C;
-			else if (s_t == c_T - 3)
-				s_nx_state <= ST_A;
-			else
-				s_nx_state <= ST_D;
-		end
-		default: begin // ST_A
-			so_btns_deb <= 4'b0000;
-			if ((si_buttons_sync == 4'b0000) ||
-				(si_buttons_sync == 4'b1000) ||
-				(si_buttons_sync == 4'b0100) ||
-				(si_buttons_sync == 4'b0010) ||
-				(si_buttons_sync == 4'b0001))
-				s_nx_state <= ST_B;
-			else
-				s_nx_state <= ST_A;
-		end
-	endcase
+    case (s_pr_state)
+        ST_B: begin
+            so_btns_deb <= 4'b0000;
+            if (si_buttons_sync != si_buttons_prev)
+                s_nx_state <= ST_A;
+            else if (s_t == c_T - 2)
+                s_nx_state <= ST_C;
+            else
+                s_nx_state <= ST_B;
+        end
+        ST_C: begin
+            so_btns_deb <= si_buttons_store;
+            if (si_buttons_sync != si_buttons_store)
+                s_nx_state <= ST_D;
+            else
+                s_nx_state <= ST_C;
+        end
+        ST_D: begin
+            so_btns_deb <= si_buttons_store;
+            if (si_buttons_sync == si_buttons_store)
+                s_nx_state <= ST_C;
+            else if (s_t == c_T - 3)
+                s_nx_state <= ST_A;
+            else
+                s_nx_state <= ST_D;
+        end
+        default: begin // ST_A
+            so_btns_deb <= 4'b0000;
+            if ((si_buttons_sync == 4'b0000) ||
+                (si_buttons_sync == 4'b1000) ||
+                (si_buttons_sync == 4'b0100) ||
+                (si_buttons_sync == 4'b0010) ||
+                (si_buttons_sync == 4'b0001))
+                s_nx_state <= ST_B;
+            else
+                s_nx_state <= ST_A;
+        end
+    endcase
 end
 
 assign o_btns_deb = so_btns_deb;

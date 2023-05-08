@@ -32,19 +32,19 @@
 //------------------------------------------------------------------------------
 //Part 1: Module header:--------------------------------------------------------
 module pmod_cls_custom_driver (
-	/* Clock and reset, with clock at 32 times the frequency of the SPI bus,
-	   with a clock enable that is 4 times the frequency of the SPI bus. */
-	i_clk_20mhz, i_rst_20mhz, i_ce_2_5mhz,
-	/* Outputs and inputs from the single SPI peripheral */
-	eo_sck_t, eo_sck_o, eo_csn_t, eo_csn_o, eo_copi_t, eo_copi_o,
-	ei_cipo,
-	/* Command ready indication and five possible commands to the driver */
-	o_command_ready,
-	i_cmd_wr_clear_display,
-	i_cmd_wr_text_line1,
-	i_cmd_wr_text_line2,
-	i_dat_ascii_line1,
-	i_dat_ascii_line2);
+    /* Clock and reset, with clock at 32 times the frequency of the SPI bus,
+       with a clock enable that is 4 times the frequency of the SPI bus. */
+    i_clk_20mhz, i_rst_20mhz, i_ce_2_5mhz,
+    /* Outputs and inputs from the single SPI peripheral */
+    eo_sck_t, eo_sck_o, eo_csn_t, eo_csn_o, eo_copi_t, eo_copi_o,
+    ei_cipo,
+    /* Command ready indication and five possible commands to the driver */
+    o_command_ready,
+    i_cmd_wr_clear_display,
+    i_cmd_wr_text_line1,
+    i_cmd_wr_text_line2,
+    i_dat_ascii_line1,
+    i_dat_ascii_line2);
 
 /* Disable or enable fast FSM delays for simulation instead of impelementation. */
 parameter integer parm_fast_simulation = 0;
@@ -115,87 +115,87 @@ reg sio_cls_cipo_sync_i;
    timing closure and glitch mitigation. */
 always @(posedge i_clk_20mhz)
 begin: p_reg_spi_fsm_out
-	if (i_ce_2_5mhz) begin
-		eo_sck_o <= sio_cls_sck_fsm_o;
-		eo_sck_t <= sio_cls_sck_fsm_t;
+    if (i_ce_2_5mhz) begin
+        eo_sck_o <= sio_cls_sck_fsm_o;
+        eo_sck_t <= sio_cls_sck_fsm_t;
 
-		eo_csn_o <= sio_cls_csn_fsm_o;
-		eo_csn_t <= sio_cls_csn_fsm_t;
+        eo_csn_o <= sio_cls_csn_fsm_o;
+        eo_csn_t <= sio_cls_csn_fsm_t;
 
-		eo_copi_o <= sio_cls_copi_fsm_o;
-		eo_copi_t <= sio_cls_copi_fsm_t;
-	end
+        eo_copi_o <= sio_cls_copi_fsm_o;
+        eo_copi_t <= sio_cls_copi_fsm_t;
+    end
 end
 
 /* Double-register the SPI input at 4x-SPI-clock cycle to prevent metastability. */
 always @(posedge i_clk_20mhz)
 begin: p_sync_spi_in
-	if (i_ce_2_5mhz) begin
-		sio_cls_cipo_sync_i <= sio_cls_cipo_meta_i;
-		sio_cls_cipo_meta_i <= ei_cipo;
-	end
+    if (i_ce_2_5mhz) begin
+        sio_cls_cipo_sync_i <= sio_cls_cipo_meta_i;
+        sio_cls_cipo_meta_i <= ei_cipo;
+    end
 end
 
 /* Single mode driver to operate the PMOD CLS via a stand-alone SPI driver. */
 pmod_cls_stand_spi_solo #(
-	.parm_fast_simulation(parm_fast_simulation),
-	.FCLK (FCLK),
-	.FCLK_ce (FCLK_ce),
-	.parm_tx_len_bits (parm_tx_len_bits),
-	.parm_wait_cyc_bits(parm_wait_cyc_bits),
-	.parm_rx_len_bits (parm_rx_len_bits)
-	) u_pmod_cls_stand_spi_solo (
-	.i_ext_spi_clk_x(i_clk_20mhz),
-	.i_srst(i_rst_20mhz),
-	.i_spi_ce_4x(i_ce_2_5mhz),
-	.o_go_stand(s_cls_go_stand),
-	.i_spi_idle(s_cls_spi_idle),
-	.o_tx_len(s_cls_tx_len),
-	.o_wait_cyc(s_cls_wait_cyc),
-	.o_rx_len(s_cls_rx_len),
-	.o_tx_data(s_cls_tx_data),
-	.o_tx_enqueue(s_cls_tx_enqueue),
-	.i_tx_ready(s_cls_tx_ready),
-	.i_rx_data(s_cls_rx_data),
-	.o_rx_dequeue(s_cls_rx_dequeue),
-	.i_rx_valid(s_cls_rx_valid),
-	.i_rx_avail(s_cls_rx_avail),
-	.o_command_ready(o_command_ready),
-	.i_cmd_wr_clear_display(i_cmd_wr_clear_display),
-	.i_cmd_wr_text_line1(i_cmd_wr_text_line1),
-	.i_cmd_wr_text_line2(i_cmd_wr_text_line2),
-	.i_dat_ascii_line1(i_dat_ascii_line1),
-	.i_dat_ascii_line2(i_dat_ascii_line2));
+    .parm_fast_simulation(parm_fast_simulation),
+    .FCLK (FCLK),
+    .FCLK_ce (FCLK_ce),
+    .parm_tx_len_bits (parm_tx_len_bits),
+    .parm_wait_cyc_bits(parm_wait_cyc_bits),
+    .parm_rx_len_bits (parm_rx_len_bits)
+    ) u_pmod_cls_stand_spi_solo (
+    .i_ext_spi_clk_x(i_clk_20mhz),
+    .i_srst(i_rst_20mhz),
+    .i_spi_ce_4x(i_ce_2_5mhz),
+    .o_go_stand(s_cls_go_stand),
+    .i_spi_idle(s_cls_spi_idle),
+    .o_tx_len(s_cls_tx_len),
+    .o_wait_cyc(s_cls_wait_cyc),
+    .o_rx_len(s_cls_rx_len),
+    .o_tx_data(s_cls_tx_data),
+    .o_tx_enqueue(s_cls_tx_enqueue),
+    .i_tx_ready(s_cls_tx_ready),
+    .i_rx_data(s_cls_rx_data),
+    .o_rx_dequeue(s_cls_rx_dequeue),
+    .i_rx_valid(s_cls_rx_valid),
+    .i_rx_avail(s_cls_rx_avail),
+    .o_command_ready(o_command_ready),
+    .i_cmd_wr_clear_display(i_cmd_wr_clear_display),
+    .i_cmd_wr_text_line1(i_cmd_wr_text_line1),
+    .i_cmd_wr_text_line2(i_cmd_wr_text_line2),
+    .i_dat_ascii_line1(i_dat_ascii_line1),
+    .i_dat_ascii_line2(i_dat_ascii_line2));
 
 /* Stand-alone SPI bus driver for a single bus-peripheral. */
 pmod_generic_spi_solo #(
-	.parm_ext_spi_clk_ratio (parm_ext_spi_clk_ratio),
-	.parm_tx_len_bits  (parm_tx_len_bits),
-	.parm_wait_cyc_bits (parm_wait_cyc_bits),
-	.parm_rx_len_bits  (parm_rx_len_bits)
-	) u_pmod_generic_spi_solo (
-	.eo_sck_o(sio_cls_sck_fsm_o),
-	.eo_sck_t(sio_cls_sck_fsm_t),
-	.eo_csn_o(sio_cls_csn_fsm_o),
-	.eo_csn_t(sio_cls_csn_fsm_t),
-	.eo_copi_o(sio_cls_copi_fsm_o),
-	.eo_copi_t(sio_cls_copi_fsm_t),
-	.ei_cipo_i(sio_cls_cipo_sync_i),
-	.i_ext_spi_clk_x(i_clk_20mhz),
-	.i_srst(i_rst_20mhz),
-	.i_spi_ce_4x(i_ce_2_5mhz),
-	.i_go_stand(s_cls_go_stand),
-	.o_spi_idle(s_cls_spi_idle),
-	.i_tx_len(s_cls_tx_len),
-	.i_wait_cyc(s_cls_wait_cyc),
-	.i_rx_len(s_cls_rx_len),
-	.i_tx_data(s_cls_tx_data),
-	.i_tx_enqueue(s_cls_tx_enqueue),
-	.o_tx_ready(s_cls_tx_ready),
-	.o_rx_data(s_cls_rx_data),
-	.i_rx_dequeue(s_cls_rx_dequeue),
-	.o_rx_valid(s_cls_rx_valid),
-	.o_rx_avail(s_cls_rx_avail));
+    .parm_ext_spi_clk_ratio (parm_ext_spi_clk_ratio),
+    .parm_tx_len_bits  (parm_tx_len_bits),
+    .parm_wait_cyc_bits (parm_wait_cyc_bits),
+    .parm_rx_len_bits  (parm_rx_len_bits)
+    ) u_pmod_generic_spi_solo (
+    .eo_sck_o(sio_cls_sck_fsm_o),
+    .eo_sck_t(sio_cls_sck_fsm_t),
+    .eo_csn_o(sio_cls_csn_fsm_o),
+    .eo_csn_t(sio_cls_csn_fsm_t),
+    .eo_copi_o(sio_cls_copi_fsm_o),
+    .eo_copi_t(sio_cls_copi_fsm_t),
+    .ei_cipo_i(sio_cls_cipo_sync_i),
+    .i_ext_spi_clk_x(i_clk_20mhz),
+    .i_srst(i_rst_20mhz),
+    .i_spi_ce_4x(i_ce_2_5mhz),
+    .i_go_stand(s_cls_go_stand),
+    .o_spi_idle(s_cls_spi_idle),
+    .i_tx_len(s_cls_tx_len),
+    .i_wait_cyc(s_cls_wait_cyc),
+    .i_rx_len(s_cls_rx_len),
+    .i_tx_data(s_cls_tx_data),
+    .i_tx_enqueue(s_cls_tx_enqueue),
+    .o_tx_ready(s_cls_tx_ready),
+    .o_rx_data(s_cls_rx_data),
+    .i_rx_dequeue(s_cls_rx_dequeue),
+    .o_rx_valid(s_cls_rx_valid),
+    .o_rx_avail(s_cls_rx_avail));
 
 endmodule
 //------------------------------------------------------------------------------

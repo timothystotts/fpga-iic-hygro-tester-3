@@ -41,7 +41,7 @@
 ------------------------------------------------------------------------------*/
 //Part 1: Module header:--------------------------------------------------------
 module pmod_hygro_i2c_solo(i_clk, i_rst, i_wr, i_rd, eo_scl, eo_sda_o, ei_sda_i,
-	eo_sda_t, i_config, o_humid, o_temp, o_valid);
+    eo_sda_t, i_config, o_humid, o_temp, o_valid);
 
 parameter integer HOLD_I2C_BOTH_SCL_EDGES = 0;
 parameter integer FCLK = 20000000;
@@ -150,24 +150,24 @@ wire s_hold_scl_ce_stop;
 /* i2c clock for FSM, generated clock
    requires create_generated_clock constraint in XDC */
 clock_divider #(
-	.par_clk_divisor(FCLK / (4 * DATA_RATE))
-	) u_i2c_4x_clock_divider (
-	.i_clk_mhz(i_clk),
-	.i_rst_mhz(i_rst),
-	.o_clk_div(s_i2c_clk_4x),
-	.o_rst_div(s_i2c_rst_4x)
-	);
+    .par_clk_divisor(FCLK / (4 * DATA_RATE))
+    ) u_i2c_4x_clock_divider (
+    .i_clk_mhz(i_clk),
+    .i_rst_mhz(i_rst),
+    .o_clk_div(s_i2c_clk_4x),
+    .o_rst_div(s_i2c_rst_4x)
+    );
 
 /* i2c clock for SCL output, generated clock
    requires create_generated_clock constraint in XDC */
 clock_divider #(
-	.par_clk_divisor(FCLK / DATA_RATE)
-	) u_i2c_1x_clock_divider (
-	.i_clk_mhz(i_clk),
-	.i_rst_mhz(i_rst),
-	.o_clk_div(s_i2c_clk_1x),
-	.o_rst_div(s_i2c_rst_1x)
-	);
+    .par_clk_divisor(FCLK / DATA_RATE)
+    ) u_i2c_1x_clock_divider (
+    .i_clk_mhz(i_clk),
+    .i_rst_mhz(i_rst),
+    .o_clk_div(s_i2c_clk_1x),
+    .o_rst_div(s_i2c_rst_1x)
+    );
 
 /* When HOLD_I2C_BOTH_SCL_EDGES is non-zero.
    The clock enables are timed for the I2C SDA line to change by the
@@ -181,51 +181,51 @@ clock_divider #(
    changing at the falling edge of SCL without delay. */
 
 generate if (HOLD_I2C_BOTH_SCL_EDGES != 0) begin
-	/* Generate 25% clock period clock enables */
-	always @(posedge s_i2c_clk_4x)
-	begin: p_i2c_clk_edges
-		reg [1:0] v_counter1;
+    /* Generate 25% clock period clock enables */
+    always @(posedge s_i2c_clk_4x)
+    begin: p_i2c_clk_edges
+        reg [1:0] v_counter1;
 
-		if (s_i2c_rst_4x)
-			v_counter1 <= 2'd0;
-		else
-			if (v_counter1 < 2'd3) v_counter1 <= v_counter1 + 1;
-			else v_counter1 <= 2'd0;
+        if (s_i2c_rst_4x)
+            v_counter1 <= 2'd0;
+        else
+            if (v_counter1 < 2'd3) v_counter1 <= v_counter1 + 1;
+            else v_counter1 <= 2'd0;
 
-		/* Note that \ref v_counter1 is updated with delta delay after this
-		   processing of the counter. Thus, counter at value zero causes
-		   Clock Enable 1 to assert, couter at value one causes Clock Enable
-		   2 to assert, and so forth. */
-		case (v_counter1)
-			0: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b1;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-			1: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b1;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-			2: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b1;
-			end
-			3: begin
-				s_i2c_clk_ce0 <= 1'b1;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-		endcase
-	end
+        /* Note that \ref v_counter1 is updated with delta delay after this
+           processing of the counter. Thus, counter at value zero causes
+           Clock Enable 1 to assert, couter at value one causes Clock Enable
+           2 to assert, and so forth. */
+        case (v_counter1)
+            0: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b1;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+            1: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b1;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+            2: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b1;
+            end
+            3: begin
+                s_i2c_clk_ce0 <= 1'b1;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+        endcase
+    end
 
-	assign s_hold_scl_ce_start = s_i2c_clk_1x || s_i2c_clk_ce3;
-	assign s_hold_scl_ce_stop = s_i2c_clk_1x || s_i2c_clk_ce2;
+    assign s_hold_scl_ce_start = s_i2c_clk_1x || s_i2c_clk_ce3;
+    assign s_hold_scl_ce_stop = s_i2c_clk_1x || s_i2c_clk_ce2;
 end endgenerate
 
 /* When HOLD_I2C_BOTH_SCL_EDGES is zero.
@@ -239,51 +239,51 @@ end endgenerate
    but the textbook example only demonstrated an implementation of SDA
    changing at the falling edge of SCL without delay. */
 generate if (HOLD_I2C_BOTH_SCL_EDGES == 0) begin
-	/* Generate 25% clock period clock enables */
-	always @(posedge s_i2c_clk_4x)
-	begin: p_i2c_clk_edges
-		reg [1:0] v_counter1;
+    /* Generate 25% clock period clock enables */
+    always @(posedge s_i2c_clk_4x)
+    begin: p_i2c_clk_edges
+        reg [1:0] v_counter1;
 
-		if (s_i2c_rst_4x)
-			v_counter1 <= 2'd0;
-		else
-			if (v_counter1 < 2'd3) v_counter1 <= v_counter1 + 1;
-			else v_counter1 <= 2'd0;
+        if (s_i2c_rst_4x)
+            v_counter1 <= 2'd0;
+        else
+            if (v_counter1 < 2'd3) v_counter1 <= v_counter1 + 1;
+            else v_counter1 <= 2'd0;
 
-		/* Note that \ref v_counter1 is updated with delta delay after this
-		   processing of the counter. Thus, counter at value zero causes
-		   Clock Enable 1 to assert, couter at value one causes Clock Enable
-		   2 to assert, and so forth. */
-		case (v_counter1)
-			0: begin
-				s_i2c_clk_ce0 <= 1'b1;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-			1: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b1;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-			2: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b1;
-				s_i2c_clk_ce3 <= 1'b0;
-			end
-			3: begin
-				s_i2c_clk_ce0 <= 1'b0;
-				// s_i2c_clk_ce1 <= 1'b0;
-				s_i2c_clk_ce2 <= 1'b0;
-				s_i2c_clk_ce3 <= 1'b1;
-			end
-		endcase
-	end
+        /* Note that \ref v_counter1 is updated with delta delay after this
+           processing of the counter. Thus, counter at value zero causes
+           Clock Enable 1 to assert, couter at value one causes Clock Enable
+           2 to assert, and so forth. */
+        case (v_counter1)
+            0: begin
+                s_i2c_clk_ce0 <= 1'b1;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+            1: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b1;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+            2: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b1;
+                s_i2c_clk_ce3 <= 1'b0;
+            end
+            3: begin
+                s_i2c_clk_ce0 <= 1'b0;
+                // s_i2c_clk_ce1 <= 1'b0;
+                s_i2c_clk_ce2 <= 1'b0;
+                s_i2c_clk_ce3 <= 1'b1;
+            end
+        endcase
+    end
 
-	assign s_hold_scl_ce_start = s_i2c_clk_1x || s_i2c_clk_ce3;
-	assign s_hold_scl_ce_stop = s_i2c_clk_1x || s_i2c_clk_ce2;
+    assign s_hold_scl_ce_start = s_i2c_clk_1x || s_i2c_clk_ce3;
+    assign s_hold_scl_ce_stop = s_i2c_clk_1x || s_i2c_clk_ce2;
 end endgenerate
 
 /* FSM state register plus auxiliary registers.
@@ -304,17 +304,17 @@ end endgenerate
    is per the HDC1080 datasheet. */
 always @(posedge s_i2c_clk_4x)
 begin: p_fsm_state_aux
-	if (s_i2c_rst_4x) begin
-		s_hygro_drv_pr_state <= ST_IDLE;
-		s_i_aux <= 0;
-		s_config_aux <= 16'd0;
-		s_hold_read_aux <= 0;
-	end else if (s_i2c_clk_ce2) begin
-		s_hygro_drv_pr_state <= s_hygro_drv_nx_state;
-		s_i_aux <= s_i_val;
-		s_config_aux <= s_config_val;
-		s_hold_read_aux <= s_hold_read_val;
-	end
+    if (s_i2c_rst_4x) begin
+        s_hygro_drv_pr_state <= ST_IDLE;
+        s_i_aux <= 0;
+        s_config_aux <= 16'd0;
+        s_hold_read_aux <= 0;
+    end else if (s_i2c_clk_ce2) begin
+        s_hygro_drv_pr_state <= s_hygro_drv_nx_state;
+        s_i_aux <= s_i_val;
+        s_config_aux <= s_config_val;
+        s_hold_read_aux <= s_hold_read_val;
+    end
 end
 
 /* FSM combinatorial logic.
@@ -322,350 +322,350 @@ end
    auxiliary registers that process _val for reading and not only
    assignment. */
 always @(s_hygro_drv_pr_state, i_wr, i_rd, s_i2c_clk_1x, s_i_val, s_i_aux,
-			i_config, s_config_aux, s_hold_read_aux, s_hold_read_val,
-			s_hold_scl_ce_start, s_hold_scl_ce_stop)
+            i_config, s_config_aux, s_hold_read_aux, s_hold_read_val,
+            s_hold_scl_ce_start, s_hold_scl_ce_stop)
 begin: p_fsm_comb
-	case (s_hygro_drv_pr_state)
-		/* Common States */
-		ST_START: begin /* Start the I2C sequence with the start bit and start clock */
-			eo_scl = s_hold_scl_ce_start;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_SLAVE_ADDR_WR;
-		end
+    case (s_hygro_drv_pr_state)
+        /* Common States */
+        ST_START: begin /* Start the I2C sequence with the start bit and start clock */
+            eo_scl = s_hold_scl_ce_start;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_SLAVE_ADDR_WR;
+        end
 
-		ST_SLAVE_ADDR_WR: begin /* Write the address of the I2C slave device, with WRITE mode bit */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_SLAVE_ADDR_WR: begin /* Write the address of the I2C slave device, with WRITE mode bit */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = HYGRO_ADDR_FOR_WR[8 - s_i_val];
-			else eo_sda_o = HYGRO_ADDR_FOR_WR[7];
+            if (s_i_val > 0) eo_sda_o = HYGRO_ADDR_FOR_WR[8 - s_i_val];
+            else eo_sda_o = HYGRO_ADDR_FOR_WR[7];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK1;
-			else s_hygro_drv_nx_state = ST_SLAVE_ADDR_WR;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK1;
+            else s_hygro_drv_nx_state = ST_SLAVE_ADDR_WR;
+        end
 
-		ST_ACK1: begin /* Ignore the slave device ACK bit for simplicity,
-						  and transition to either a WRITE or READ register
-						  address value. */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_hold_read_val = s_hold_read_aux;
-			eo_sda_o = 1'b0;
+        ST_ACK1: begin /* Ignore the slave device ACK bit for simplicity,
+                          and transition to either a WRITE or READ register
+                          address value. */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_hold_read_val = s_hold_read_aux;
+            eo_sda_o = 1'b0;
 
-			if (i_wr) begin
-				s_config_val = i_config;
-				s_hygro_drv_nx_state = ST_INITIAL_ADDR_WR;
-			end else begin
-				s_config_val = s_config_aux;
-				s_hygro_drv_nx_state = ST_INITIAL_ADDR_RD;
-			end
-		end
+            if (i_wr) begin
+                s_config_val = i_config;
+                s_hygro_drv_nx_state = ST_INITIAL_ADDR_WR;
+            end else begin
+                s_config_val = s_config_aux;
+                s_hygro_drv_nx_state = ST_INITIAL_ADDR_RD;
+            end
+        end
 
-		ST_STOP: begin /* Stop the WRITE or READ command sequence with a STOP bit
-						  and STOP clock */
-			eo_scl = s_hold_scl_ce_stop;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_HOLD;
-		end
+        ST_STOP: begin /* Stop the WRITE or READ command sequence with a STOP bit
+                          and STOP clock */
+            eo_scl = s_hold_scl_ce_stop;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_HOLD;
+        end
 
-		ST_HOLD: begin /* After stopping, hold the clock and a hold bit; return
-						  to IDLE based on READ and WRITE command inputs */
-			eo_scl = 1'b1;
-			eo_sda_o = 1'b1;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_HOLD: begin /* After stopping, hold the clock and a hold bit; return
+                          to IDLE based on READ and WRITE command inputs */
+            eo_scl = 1'b1;
+            eo_sda_o = 1'b1;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (i_wr || i_rd) s_hygro_drv_nx_state = ST_HOLD;
-			else s_hygro_drv_nx_state = ST_IDLE;			
-		end
+            if (i_wr || i_rd) s_hygro_drv_nx_state = ST_HOLD;
+            else s_hygro_drv_nx_state = ST_IDLE;
+        end
 
-		/* Data-write states */
-		ST_INITIAL_ADDR_WR: begin /* WRITE the initiate WRITE ADDRESS, which for the
-									 HDC1080 driver will only be the Configuration
-									 Register HYGRO_CONFIG_REG_ADDR */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        /* Data-write states */
+        ST_INITIAL_ADDR_WR: begin /* WRITE the initiate WRITE ADDRESS, which for the
+                                     HDC1080 driver will only be the Configuration
+                                     Register HYGRO_CONFIG_REG_ADDR */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = HYGRO_CONFIG_REG_ADDR[8 - s_i_val];
-			else eo_sda_o = HYGRO_CONFIG_REG_ADDR[7];
+            if (s_i_val > 0) eo_sda_o = HYGRO_CONFIG_REG_ADDR[8 - s_i_val];
+            else eo_sda_o = HYGRO_CONFIG_REG_ADDR[7];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK2;
-			else s_hygro_drv_nx_state = ST_INITIAL_ADDR_WR;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK2;
+            else s_hygro_drv_nx_state = ST_INITIAL_ADDR_WR;
+        end
 
-		ST_ACK2: begin /* Ignore the slave device ACK for simplicity */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_ACK2: begin /* Ignore the slave device ACK for simplicity */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			s_hygro_drv_nx_state = ST_WR_CONFIG_HI;
-		end
+            s_hygro_drv_nx_state = ST_WR_CONFIG_HI;
+        end
 
-		ST_WR_CONFIG_HI: begin /* Write the MSByte value of the 16-bit Configuration
-								  Register */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_WR_CONFIG_HI: begin /* Write the MSByte value of the 16-bit Configuration
+                                  Register */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = s_config_aux[16 - s_i_val];
-			else eo_sda_o = s_config_aux[15];
+            if (s_i_val > 0) eo_sda_o = s_config_aux[16 - s_i_val];
+            else eo_sda_o = s_config_aux[15];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK3;
-			else s_hygro_drv_nx_state = ST_WR_CONFIG_HI;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK3;
+            else s_hygro_drv_nx_state = ST_WR_CONFIG_HI;
+        end
 
-		ST_ACK3: begin /* Ignore the slave device ACK for simplicity */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_WR_CONFIG_LO;
-		end
+        ST_ACK3: begin /* Ignore the slave device ACK for simplicity */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_WR_CONFIG_LO;
+        end
 
-		ST_WR_CONFIG_LO: begin /* Write the LSByte value of the 16-bit Configuration
-								  Register */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_WR_CONFIG_LO: begin /* Write the LSByte value of the 16-bit Configuration
+                                  Register */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = s_config_aux[8 - s_i_val];
-			else eo_sda_o = s_config_aux[7];
+            if (s_i_val > 0) eo_sda_o = s_config_aux[8 - s_i_val];
+            else eo_sda_o = s_config_aux[7];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK4;
-			else s_hygro_drv_nx_state = ST_WR_CONFIG_LO;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK4;
+            else s_hygro_drv_nx_state = ST_WR_CONFIG_LO;
+        end
 
-		ST_ACK4: begin /* Ignore the slave device ACK for simplicity */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_STOP;
-		end
+        ST_ACK4: begin /* Ignore the slave device ACK for simplicity */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_STOP;
+        end
 
-		/* Data-read states */
-		ST_INITIAL_ADDR_RD: begin /* WRITE the initiate READ ADDRESS, which for the
-									 HDC1080 driver will only be the Temperature
-									 Register HYGRO_TEMP_REG_ADDR */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        /* Data-read states */
+        ST_INITIAL_ADDR_RD: begin /* WRITE the initiate READ ADDRESS, which for the
+                                     HDC1080 driver will only be the Temperature
+                                     Register HYGRO_TEMP_REG_ADDR */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = HYGRO_TEMP_REG_ADDR[8 - s_i_val];
-			else eo_sda_o = HYGRO_TEMP_REG_ADDR[7];
+            if (s_i_val > 0) eo_sda_o = HYGRO_TEMP_REG_ADDR[8 - s_i_val];
+            else eo_sda_o = HYGRO_TEMP_REG_ADDR[7];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK5;
-			else s_hygro_drv_nx_state = ST_INITIAL_ADDR_RD;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK5;
+            else s_hygro_drv_nx_state = ST_INITIAL_ADDR_RD;
+        end
 
-		ST_ACK5: begin /* Ignore the slave device ACK for simplicity */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = 0;
-			s_hygro_drv_nx_state = ST_STOP_READING;
-		end
+        ST_ACK5: begin /* Ignore the slave device ACK for simplicity */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = 0;
+            s_hygro_drv_nx_state = ST_STOP_READING;
+        end
 
-		ST_STOP_READING: begin /* Write a STOP bit and STOP clock to end the WRITE
-								  of the READ register pointer, per HDC1080 datasheet. */
-			eo_scl = s_hold_scl_ce_stop;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_HOLD_READING;
-		end
+        ST_STOP_READING: begin /* Write a STOP bit and STOP clock to end the WRITE
+                                  of the READ register pointer, per HDC1080 datasheet. */
+            eo_scl = s_hold_scl_ce_stop;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_HOLD_READING;
+        end
 
-		ST_HOLD_READING: begin
-			eo_scl = 1'b1;
-			eo_sda_o = 1'b1;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux + 1;
+        ST_HOLD_READING: begin
+            eo_scl = 1'b1;
+            eo_sda_o = 1'b1;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux + 1;
 
-			if (s_hold_read_val == c_hold_read_duration)
-				s_hygro_drv_nx_state = ST_START_READING;
-			else s_hygro_drv_nx_state = ST_HOLD_READING;			
-		end
+            if (s_hold_read_val == c_hold_read_duration)
+                s_hygro_drv_nx_state = ST_START_READING;
+            else s_hygro_drv_nx_state = ST_HOLD_READING;
+        end
 
-		ST_START_READING: begin /* Write the START bit and START clock to start a reading
-								   of the HDC1080 measurement registers. */
-			eo_scl = s_hold_scl_ce_start;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_SLAVE_ADDR_RD;
-		end
+        ST_START_READING: begin /* Write the START bit and START clock to start a reading
+                                   of the HDC1080 measurement registers. */
+            eo_scl = s_hold_scl_ce_start;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_SLAVE_ADDR_RD;
+        end
 
-		ST_SLAVE_ADDR_RD: begin /* Write the slave device address with a READ bit */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_t = 1'b0;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_SLAVE_ADDR_RD: begin /* Write the slave device address with a READ bit */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_t = 1'b0;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val > 0) eo_sda_o = HYGRO_ADDR_FOR_RD[8 - s_i_val];
-			else eo_sda_o = HYGRO_ADDR_FOR_RD[7];
+            if (s_i_val > 0) eo_sda_o = HYGRO_ADDR_FOR_RD[8 - s_i_val];
+            else eo_sda_o = HYGRO_ADDR_FOR_RD[7];
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK6;
-			else s_hygro_drv_nx_state = ST_SLAVE_ADDR_RD;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK6;
+            else s_hygro_drv_nx_state = ST_SLAVE_ADDR_RD;
+        end
 
-		ST_ACK6: begin /* Ignore the ACK from the slave device for simplicity */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_RD_TEMP_HI;
-		end
+        ST_ACK6: begin /* Ignore the ACK from the slave device for simplicity */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_RD_TEMP_HI;
+        end
 
-		ST_RD_TEMP_HI: begin /* Track a Read Temperature register MSByte and
-								index it for the other process to capture that
-								value, bit-at-a-time. */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_RD_TEMP_HI: begin /* Track a Read Temperature register MSByte and
+                                index it for the other process to capture that
+                                value, bit-at-a-time. */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK7;
-			else s_hygro_drv_nx_state = ST_RD_TEMP_HI;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK7;
+            else s_hygro_drv_nx_state = ST_RD_TEMP_HI;
+        end
 
-		ST_ACK7: begin /* Write a Master Device ACK*/
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_RD_TEMP_LO;
-		end
+        ST_ACK7: begin /* Write a Master Device ACK*/
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_RD_TEMP_LO;
+        end
 
-		ST_RD_TEMP_LO: begin /* Track a Read Temperature register LSByte and
-								index it for the other process to capture that
-								value, bit-at-a-time. */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_RD_TEMP_LO: begin /* Track a Read Temperature register LSByte and
+                                index it for the other process to capture that
+                                value, bit-at-a-time. */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK8;
-			else s_hygro_drv_nx_state = ST_RD_TEMP_LO;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK8;
+            else s_hygro_drv_nx_state = ST_RD_TEMP_LO;
+        end
 
-		ST_ACK8: begin /* Write a Master Device ACK*/
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_RD_HUMID_HI;
-		end
+        ST_ACK8: begin /* Write a Master Device ACK*/
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_RD_HUMID_HI;
+        end
 
-		ST_RD_HUMID_HI: begin /* Track a Read Relative Humidity register MSByte
-								 index it for the other process to capture that
-								 value, bit-at-a-time. */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_RD_HUMID_HI: begin /* Track a Read Relative Humidity register MSByte
+                                 index it for the other process to capture that
+                                 value, bit-at-a-time. */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK9;
-			else s_hygro_drv_nx_state = ST_RD_HUMID_HI;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_ACK9;
+            else s_hygro_drv_nx_state = ST_RD_HUMID_HI;
+        end
 
-		ST_ACK9: begin /* Write a Master Device ACK*/
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_RD_HUMID_LO;
-		end
+        ST_ACK9: begin /* Write a Master Device ACK*/
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_RD_HUMID_LO;
+        end
 
-		ST_RD_HUMID_LO: begin /* Track a Read Relative Humidity register LSByte
-								 index it for the other process to capture that
-								 value, bit-at-a-time. */
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b0;
-			eo_sda_t = 1'b1;
-			s_i_val = s_i_aux + 1;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
+        ST_RD_HUMID_LO: begin /* Track a Read Relative Humidity register LSByte
+                                 index it for the other process to capture that
+                                 value, bit-at-a-time. */
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b0;
+            eo_sda_t = 1'b1;
+            s_i_val = s_i_aux + 1;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
 
-			if (s_i_val == 8) s_hygro_drv_nx_state = ST_NO_ACK;
-			else s_hygro_drv_nx_state = ST_RD_HUMID_LO;
-		end
+            if (s_i_val == 8) s_hygro_drv_nx_state = ST_NO_ACK;
+            else s_hygro_drv_nx_state = ST_RD_HUMID_LO;
+        end
 
-		ST_NO_ACK: begin /* Write a Master Device No-ACK*/
-			eo_scl = s_i2c_clk_1x;
-			eo_sda_o = 1'b1;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			s_hygro_drv_nx_state = ST_STOP;
-		end
+        ST_NO_ACK: begin /* Write a Master Device No-ACK*/
+            eo_scl = s_i2c_clk_1x;
+            eo_sda_o = 1'b1;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+            s_hygro_drv_nx_state = ST_STOP;
+        end
 
-		default: begin /* The default state is wait for a READ or WRITE strobe
-						  while in IDLE state ST_IDLE */
-			eo_scl = 1'b1;
-			eo_sda_o = 1'b1;
-			eo_sda_t = 1'b0;
-			s_i_val = 0;
-			s_config_val = s_config_aux;
-			s_hold_read_val = s_hold_read_aux;
-			
-			if (i_wr || i_rd) s_hygro_drv_nx_state = ST_START;
-			else s_hygro_drv_nx_state = ST_IDLE;
-		end
-	endcase
+        default: begin /* The default state is wait for a READ or WRITE strobe
+                          while in IDLE state ST_IDLE */
+            eo_scl = 1'b1;
+            eo_sda_o = 1'b1;
+            eo_sda_t = 1'b0;
+            s_i_val = 0;
+            s_config_val = s_config_aux;
+            s_hold_read_val = s_hold_read_aux;
+
+            if (i_wr || i_rd) s_hygro_drv_nx_state = ST_START;
+            else s_hygro_drv_nx_state = ST_IDLE;
+        end
+    endcase
 end
 
 /* Store data read from the HYGRO sensor and export it.
@@ -676,24 +676,24 @@ end
 /*
 always @(posedge s_i2c_clk_4x)
 begin: p_fsm_data_out
-	if (s_i2c_clk_4x) begin
-		if (s_i2c_clk_ce0) begin
-			o_valid <= 1'b0;
+    if (s_i2c_clk_4x) begin
+        if (s_i2c_clk_ce0) begin
+            o_valid <= 1'b0;
 
-			if (s_i_val > 0) begin
-				if (s_hygro_drv_pr_state == ST_RD_TEMP_HI) begin
-					s_temp_aux[16 - s_i_val] <= ei_sda_i;
-				end else if (s_hygro_drv_pr_state == ST_RD_TEMP_LO) begin
-					s_temp_aux[8 - s_i_val] <= ei_sda_i;
-				end else if (s_hygro_drv_pr_state == ST_RD_HUMID_HI) begin
-					s_humid_aux[16 - s_i_val] <= ei_sda_i;
-				end else if (s_hygro_drv_pr_state == ST_RD_HUMID_LO) begin
-					s_humid_aux[8 - s_i_val] <= ei_sda_i;
-					if (s_i_val == 8) o_valid <= 1'b1;
-				end
-			end
-		end
-	end
+            if (s_i_val > 0) begin
+                if (s_hygro_drv_pr_state == ST_RD_TEMP_HI) begin
+                    s_temp_aux[16 - s_i_val] <= ei_sda_i;
+                end else if (s_hygro_drv_pr_state == ST_RD_TEMP_LO) begin
+                    s_temp_aux[8 - s_i_val] <= ei_sda_i;
+                end else if (s_hygro_drv_pr_state == ST_RD_HUMID_HI) begin
+                    s_humid_aux[16 - s_i_val] <= ei_sda_i;
+                end else if (s_hygro_drv_pr_state == ST_RD_HUMID_LO) begin
+                    s_humid_aux[8 - s_i_val] <= ei_sda_i;
+                    if (s_i_val == 8) o_valid <= 1'b1;
+                end
+            end
+        end
+    end
 end
 */
 
@@ -704,27 +704,27 @@ end
    one of the four BYTE captures. */
 always @(posedge s_i2c_clk_4x)
 begin: p_fsm_data_out
-	if (s_i2c_rst_4x) begin
-		s_temp_aux <= 16'h0000;
-		s_humid_aux <= 16'h0000;
-		o_valid <= 1'b0;
+    if (s_i2c_rst_4x) begin
+        s_temp_aux <= 16'h0000;
+        s_humid_aux <= 16'h0000;
+        o_valid <= 1'b0;
 
-	end else if (s_i2c_clk_ce0) begin
-		o_valid <= 1'b0;
+    end else if (s_i2c_clk_ce0) begin
+        o_valid <= 1'b0;
 
-		if (s_i_aux < 8) begin
-			if (s_hygro_drv_pr_state == ST_RD_TEMP_HI)
-				s_temp_aux[15-:16] <= {s_temp_aux[14-:15], ei_sda_i};
-			else if (s_hygro_drv_pr_state == ST_RD_TEMP_LO)
-				s_temp_aux[15-:16] <= {s_temp_aux[14-:15], ei_sda_i};
-			else if (s_hygro_drv_pr_state == ST_RD_HUMID_HI)
-				s_humid_aux[15-:16] <= {s_humid_aux[14-:15], ei_sda_i};
-			else if (s_hygro_drv_pr_state == ST_RD_HUMID_LO) begin
-				s_humid_aux[15-:16] <= {s_humid_aux[14-:15], ei_sda_i};
-				if (s_i_aux == 7) o_valid <= 1'b1;
-			end
-		end
-	end
+        if (s_i_aux < 8) begin
+            if (s_hygro_drv_pr_state == ST_RD_TEMP_HI)
+                s_temp_aux[15-:16] <= {s_temp_aux[14-:15], ei_sda_i};
+            else if (s_hygro_drv_pr_state == ST_RD_TEMP_LO)
+                s_temp_aux[15-:16] <= {s_temp_aux[14-:15], ei_sda_i};
+            else if (s_hygro_drv_pr_state == ST_RD_HUMID_HI)
+                s_humid_aux[15-:16] <= {s_humid_aux[14-:15], ei_sda_i};
+            else if (s_hygro_drv_pr_state == ST_RD_HUMID_LO) begin
+                s_humid_aux[15-:16] <= {s_humid_aux[14-:15], ei_sda_i};
+                if (s_i_aux == 7) o_valid <= 1'b1;
+            end
+        end
+    end
 end
 
 /* The current temperature and relative humidity exported values

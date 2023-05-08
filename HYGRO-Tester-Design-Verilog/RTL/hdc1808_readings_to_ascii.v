@@ -57,10 +57,10 @@ output reg [(16*8-1):0] o_txt_ascii_line2;
 /* A re-entrant function that converts a 4-bit part-select to an 8-bit ASCII
    hexadecimal character. */
 function automatic [7:0] ascii_of_hdigit(input [3:0] bchex_val);
-	begin
-		if (bchex_val < 10) ascii_of_hdigit = 8'h30 + {4'h0, bchex_val};
-		else ascii_of_hdigit = 8'h37 + {4'h0, bchex_val};
-	end
+    begin
+        if (bchex_val < 10) ascii_of_hdigit = 8'h30 + {4'h0, bchex_val};
+        else ascii_of_hdigit = 8'h37 + {4'h0, bchex_val};
+    end
 endfunction
 
 integer s_temperature_c;

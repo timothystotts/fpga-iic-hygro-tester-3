@@ -73,7 +73,7 @@ localparam integer c_wr_rd_cycle_duration_clk = 20000000;
    according to the PMOD HYGRO datasheet, is the fastest poll time to not
    overheat the temperature sensor and thus produce invalid readings. */
 localparam integer c_wr_rd_cycle_duration_time = (parm_fast_simulation) ?
-	(c_wr_rd_cycle_duration_clk / 250) : (c_wr_rd_cycle_duration_clk / 10);
+    (c_wr_rd_cycle_duration_clk / 250) : (c_wr_rd_cycle_duration_clk / 10);
 
 /* LUT-lookup FSM variables for process \ref p_run_hygro */
 integer v_counter1;
@@ -89,31 +89,31 @@ reg [3:0] s_prev_buttons;
    measurements on a timer, which is set to once per second. */
 always @(posedge i_clk_20mhz)
 begin: p_run_hygro
-	/* Syncrhonous reset */
-	if (i_rst_20mhz) begin
-		v_counter1 <= 0;
-		v_counter2 <= 0;
-		v_configured <= 1'b0;
+    /* Syncrhonous reset */
+    if (i_rst_20mhz) begin
+        v_counter1 <= 0;
+        v_counter2 <= 0;
+        v_configured <= 1'b0;
     end else if (i_switches_debounced != 4'b0001) begin
-		v_counter1 <= 0;
-		v_counter2 <= 0;
-		v_configured <= 1'b0;        
-	end else begin
-		/* Synchronous processing of Counter 1 and divided Counter 2. */
-		if (v_counter1 < c_wr_rd_cycle_duration_time) begin
-			v_counter1 <= v_counter1 + 1;
-		end else begin
-			v_counter1 <= 0;
+        v_counter1 <= 0;
+        v_counter2 <= 0;
+        v_configured <= 1'b0;
+    end else begin
+        /* Synchronous processing of Counter 1 and divided Counter 2. */
+        if (v_counter1 < c_wr_rd_cycle_duration_time) begin
+            v_counter1 <= v_counter1 + 1;
+        end else begin
+            v_counter1 <= 0;
 
-			if (v_counter2 < 9) begin
-				v_counter2 <= v_counter2 + 1;
-			end else begin
-				v_counter2 <= 0;
-			end
-		end
+            if (v_counter2 < 9) begin
+                v_counter2 <= v_counter2 + 1;
+            end else begin
+                v_counter2 <= 0;
+            end
+        end
 
-		if (v_counter2 == 8) v_configured <= 1'b1;
-	end
+        if (v_counter2 == 8) v_configured <= 1'b1;
+    end
 end
 
 /* LUT-lookup FSM, Where the divided Counter 2 operates the outputs
@@ -122,25 +122,25 @@ end
    is visited. Afterword, only State 9 outputs a pulse (RD). */
 always @(v_counter2, v_configured)
 begin: p_run_hygro_lut
-	case (v_counter2)
-		7: begin
-			if (~ v_configured) o_hygro_wr = 1'b1;
-			else o_hygro_wr = 1'b0;
-			o_hygro_rd = 1'b0;
-		end
-		8: begin
-			o_hygro_wr = 1'b0;
-			o_hygro_rd = 1'b0;
-		end
-		9: begin
-			o_hygro_wr = 1'b0;
-			o_hygro_rd = 1'b1;
-		end
-		default: begin /* cases 0, 1, 2, 3, 4, 5, 6 */
-			o_hygro_wr = 1'b0;
-			o_hygro_rd = 1'b0;
-		end
-	endcase
+    case (v_counter2)
+        7: begin
+            if (~ v_configured) o_hygro_wr = 1'b1;
+            else o_hygro_wr = 1'b0;
+            o_hygro_rd = 1'b0;
+        end
+        8: begin
+            o_hygro_wr = 1'b0;
+            o_hygro_rd = 1'b0;
+        end
+        9: begin
+            o_hygro_wr = 1'b0;
+            o_hygro_rd = 1'b1;
+        end
+        default: begin /* cases 0, 1, 2, 3, 4, 5, 6 */
+            o_hygro_wr = 1'b0;
+            o_hygro_rd = 1'b0;
+        end
+    endcase
 end
 
 /* Capture completed reading of HYGRO temperature and humidity for display
@@ -149,14 +149,14 @@ end
    cycle of the 10 MHz clock. */
 always @(posedge i_clk_20mhz)
 begin: p_capture_hygro
-	if (i_rst_20mhz) begin
-		o_display_temp <= 16'h0000;
-		o_display_humid <= 16'h0000;
-	end else
-		if (i_hygro_valid) begin
-			o_display_temp <= i_hygro_temp;
-			o_display_humid <= i_hygro_humid;
-		end
+    if (i_rst_20mhz) begin
+        o_display_temp <= 16'h0000;
+        o_display_humid <= 16'h0000;
+    end else
+        if (i_hygro_valid) begin
+            o_display_temp <= i_hygro_temp;
+            o_display_humid <= i_hygro_humid;
+        end
 end
 
 /* Process basd on user inputs what mode the display is in. */
@@ -179,7 +179,7 @@ begin: p_process_userio
                 o_hygro_display_mode <= DISP_BOTH_CELCIUS;
             else
                 o_hygro_display_mode <= DISP_BOTH_FARH;
-        
+
         if ((s_prev_buttons == 4'b0000) && (i_buttons_debounced == 4'b0010))
             o_hygro_display_mode <= DISP_ONLY_TEMP_C;
 

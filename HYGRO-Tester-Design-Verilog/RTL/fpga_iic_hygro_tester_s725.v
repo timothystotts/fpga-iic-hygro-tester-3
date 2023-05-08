@@ -33,29 +33,29 @@
 /* FIXME: The design top-level utilizes the default TECHNOLOGY, SLEW, and DRIVE. */
 //Part 1: Module header:--------------------------------------------------------
 module fpga_iic_hygro_tester_s725(
-	/* external clock and active-low reset */
-	CLK12MHZ, i_resetn,
-	/* PMOD HYGRO IIC bus 2-wire */
-	eo_scl, eio_sda,
-	/* blue LEDs of the multicolor */
-	eo_led0_b, eo_led1_b,
-	/* red LEDs of the multicolor */
-	eo_led0_r, eo_led1_r,
-	/* green LEDs of the multicolor */
-	eo_led0_g, eo_led1_g,
-	/* green LEDs of the regular LEDs */
-	eo_led2, eo_led3, eo_led4, eo_led5,
-	/* four switches */
-	ei_sw0, ei_sw1, ei_sw2, ei_sw3,
-	/* four buttons */
-	ei_btn0, ei_btn1, ei_btn2, ei_btn3,
-	/* PMOD CLS SPI bus 4-wire */
-	eo_pmod_cls_csn, eo_pmod_cls_sck, eo_pmod_cls_dq0,
-	ei_pmod_cls_dq1,
-	/* Arty S7-25T UART TX and RX signals */
-	eo_uart_tx, ei_uart_rx,
-	/* PMOD SSD direct GPIO */
-	eo_ssd_pmod0);
+    /* external clock and active-low reset */
+    CLK12MHZ, i_resetn,
+    /* PMOD HYGRO IIC bus 2-wire */
+    eo_scl, eio_sda,
+    /* blue LEDs of the multicolor */
+    eo_led0_b, eo_led1_b,
+    /* red LEDs of the multicolor */
+    eo_led0_r, eo_led1_r,
+    /* green LEDs of the multicolor */
+    eo_led0_g, eo_led1_g,
+    /* green LEDs of the regular LEDs */
+    eo_led2, eo_led3, eo_led4, eo_led5,
+    /* four switches */
+    ei_sw0, ei_sw1, ei_sw2, ei_sw3,
+    /* four buttons */
+    ei_btn0, ei_btn1, ei_btn2, ei_btn3,
+    /* PMOD CLS SPI bus 4-wire */
+    eo_pmod_cls_csn, eo_pmod_cls_sck, eo_pmod_cls_dq0,
+    ei_pmod_cls_dq1,
+    /* Arty S7-25T UART TX and RX signals */
+    eo_uart_tx, ei_uart_rx,
+    /* PMOD SSD direct GPIO */
+    eo_ssd_pmod0);
 
 /* Disable or enable fast FSM delays for simulation instead of impelementation. */
 parameter integer parm_fast_simulation = 0;
@@ -296,17 +296,17 @@ MMCME2_BASE_inst (
 
 /* Reset Synchronization for 40 MHz clock. */
 arty_reset_synchronizer #() u_reset_synch_20mhz(
-	.i_clk_mhz(s_clk_20mhz),
-	.i_rstn_global(i_resetn),
-	.o_rst_mhz(s_rst_20mhz)
-	);
+    .i_clk_mhz(s_clk_20mhz),
+    .i_rstn_global(i_resetn),
+    .o_rst_mhz(s_rst_20mhz)
+    );
 
 /* Reset Synchronization for 7.37 MHz clock. */
 arty_reset_synchronizer #() u_reset_synch_7_37mhz (
-	.i_clk_mhz(s_clk_7_37mhz),
-	.i_rstn_global(i_resetn),
-	.o_rst_mhz(s_rst_7_37mhz)
-	);
+    .i_clk_mhz(s_clk_7_37mhz),
+    .i_rstn_global(i_resetn),
+    .o_rst_mhz(s_rst_7_37mhz)
+    );
 
 /* 4x spi clock enable divider for PMOD CLS SCK output. No
    generated clock constraint. The 20 MHz clock is divided
@@ -315,10 +315,10 @@ arty_reset_synchronizer #() u_reset_synch_7_37mhz (
 clock_enable_divider #(
   .par_ce_divisor(8)
   ) u_2_5mhz_ce_divider (
-	.o_ce_div(s_ce_2_5mhz),
-	.i_clk_mhz(s_clk_20mhz),
-	.i_rst_mhz(s_rst_20mhz),
-	.i_ce_mhz(1'b1));
+    .o_ce_div(s_ce_2_5mhz),
+    .i_clk_mhz(s_clk_20mhz),
+    .i_rst_mhz(s_rst_20mhz),
+    .i_ce_mhz(1'b1));
 
 // Synchronize and debounce the four input switches on the Arty A7 to be
 // debounced and exclusive of each other (ignored if more than one
@@ -369,60 +369,60 @@ led_pwm_driver #(
 
 /* LED palette pulser to manage the display of the LEDs */
 led_palette_pulser #(
-	.parm_color_led_count(2),
-	.parm_basic_led_count(4),
-	.parm_FCLK(c_FCLK),
-	.parm_adjustments_per_second(85)
-	) u_led_palette_pulser (
-	.i_clk(s_clk_20mhz),
-	.i_srst(s_rst_20mhz),
-	.o_color_led_red_value(s_color_led_red_value),
-	.o_color_led_green_value(s_color_led_green_value),
-	.o_color_led_blue_value(s_color_led_blue_value),
-	.o_basic_led_lumin_value(s_basic_led_lumin_value),
-	.o_display_index_value0(s_display_index_value0),
-	.o_display_index_value1(s_display_index_value1),
-	.i_hygro_op_mode(s_hygro_op_mode),
-	.i_hygro_display_mode(s_hygro_display_mode)
-	);
+    .parm_color_led_count(2),
+    .parm_basic_led_count(4),
+    .parm_FCLK(c_FCLK),
+    .parm_adjustments_per_second(85)
+    ) u_led_palette_pulser (
+    .i_clk(s_clk_20mhz),
+    .i_srst(s_rst_20mhz),
+    .o_color_led_red_value(s_color_led_red_value),
+    .o_color_led_green_value(s_color_led_green_value),
+    .o_color_led_blue_value(s_color_led_blue_value),
+    .o_basic_led_lumin_value(s_basic_led_lumin_value),
+    .o_display_index_value0(s_display_index_value0),
+    .o_display_index_value1(s_display_index_value1),
+    .i_hygro_op_mode(s_hygro_op_mode),
+    .i_hygro_display_mode(s_hygro_display_mode)
+    );
 
 /* contains clock_divider instance that requires
    XDC command create_generated_clock */
 // TODO: Augment to pmod_hygro_custom_driver
 pmod_hygro_i2c_solo #(
-	.HOLD_I2C_BOTH_SCL_EDGES(1),
-	.FCLK(c_FCLK),
-	.DATA_RATE(100000)
-	) u_pmod_hygro_i2c_solo (
-	.i_clk(s_clk_20mhz),
-	.i_rst(s_rst_20mhz),
-	.i_wr(s_hygro_wr),
-	.i_rd(s_hygro_rd),
-	.eo_scl(eo_scl_o_comb),
-	.eo_sda_o(eo_sda_o_comb),
-	.ei_sda_i(ei_sda_i_sync),
-	.eo_sda_t(eo_sda_t_comb),
-	.i_config(s_hygro_config),
-	.o_humid(s_hygro_humid),
-	.o_temp(s_hygro_temp),
-	.o_valid(s_hygro_valid));
+    .HOLD_I2C_BOTH_SCL_EDGES(1),
+    .FCLK(c_FCLK),
+    .DATA_RATE(100000)
+    ) u_pmod_hygro_i2c_solo (
+    .i_clk(s_clk_20mhz),
+    .i_rst(s_rst_20mhz),
+    .i_wr(s_hygro_wr),
+    .i_rd(s_hygro_rd),
+    .eo_scl(eo_scl_o_comb),
+    .eo_sda_o(eo_sda_o_comb),
+    .ei_sda_i(ei_sda_i_sync),
+    .eo_sda_t(eo_sda_t_comb),
+    .i_config(s_hygro_config),
+    .o_humid(s_hygro_humid),
+    .o_temp(s_hygro_temp),
+    .o_valid(s_hygro_valid));
 
 /* Tri-state output/input of IIC SDA to connect to HYGRO PMOD */
 
 /* Synchronize the input to mitigate meta-stability */
 always @(posedge s_clk_20mhz)
 begin: p_sync_iic_in
-	ei_sda_i_sync <= ei_sda_i_meta;
-	ei_sda_i_meta <= ei_sda_i;
+    ei_sda_i_sync <= ei_sda_i_meta;
+    ei_sda_i_meta <= ei_sda_i;
 end
 
 /* Synchronize the output to mitigate glitches and provide IOBUF_inst/IBUF
    signal drive. */
 always @(posedge s_clk_20mhz)
 begin: p_sync_iic_out
-	eo_scl_o_sync <= eo_scl_o_comb;
-	eo_sda_o_sync <= eo_sda_o_comb;
-	eo_sda_t_sync <= eo_sda_t_comb;
+    eo_scl_o_sync <= eo_scl_o_comb;
+    eo_sda_o_sync <= eo_sda_o_comb;
+    eo_sda_t_sync <= eo_sda_t_comb;
 end
 
 /* Output the synchronized SCL I2C clock signal. */
@@ -445,22 +445,22 @@ IOBUF #(
 
 /* Tester FSM to operate the states of the Pmod HYGRO based on switch input */
 hygro_tester_fsm #(
-		.parm_fast_simulation(parm_fast_simulation)
-	) u_hygro_tester_fsm (
-		.i_clk_20mhz(s_clk_20mhz),
-		.i_rst_20mhz(s_rst_20mhz),
-		.i_switches_debounced(s_sw_deb),
-		.i_buttons_debounced(s_btn_deb),
-		.i_hygro_temp(s_hygro_temp),
-		.i_hygro_humid(s_hygro_humid),
-		.i_hygro_valid(s_hygro_valid),
-		.o_hygro_rd(s_hygro_rd),
-		.o_hygro_wr(s_hygro_wr),
-		.o_display_temp(s_display_temp),
-		.o_display_humid(s_display_humid),
-		.o_hygro_op_mode(s_hygro_op_mode),
-		.o_hygro_display_mode(s_hygro_display_mode)
-	);
+        .parm_fast_simulation(parm_fast_simulation)
+    ) u_hygro_tester_fsm (
+        .i_clk_20mhz(s_clk_20mhz),
+        .i_rst_20mhz(s_rst_20mhz),
+        .i_switches_debounced(s_sw_deb),
+        .i_buttons_debounced(s_btn_deb),
+        .i_hygro_temp(s_hygro_temp),
+        .i_hygro_humid(s_hygro_humid),
+        .i_hygro_valid(s_hygro_valid),
+        .o_hygro_rd(s_hygro_rd),
+        .o_hygro_wr(s_hygro_wr),
+        .o_display_temp(s_display_temp),
+        .o_display_humid(s_display_humid),
+        .o_hygro_op_mode(s_hygro_op_mode),
+        .o_hygro_display_mode(s_hygro_display_mode)
+    );
 
 /* Hygro Configuration, static value: enable reading of both the temperature
    and relative humidity 16-bit register measurement reading values in a
@@ -475,28 +475,28 @@ assign eo_pmod_cls_dq0 = so_pmod_cls_copi_t ? 1'bz : so_pmod_cls_copi_o;
 /* Instance of the PMOD CLS driver for 16x2 character LCD display for purposes
    of an output display. */
 pmod_cls_custom_driver #(
-	.parm_fast_simulation(parm_fast_simulation),
-	.FCLK(c_FCLK),
+    .parm_fast_simulation(parm_fast_simulation),
+    .FCLK(c_FCLK),
    .FCLK_ce(2500000),
-	.parm_ext_spi_clk_ratio(32),
-	.parm_wait_cyc_bits(`c_stand_spi_wait_count_bits)
-	) u_pmod_cls_custom_driver (
-	.i_clk_20mhz(s_clk_20mhz),
-	.i_rst_20mhz(s_rst_20mhz),
-	.i_ce_2_5mhz(s_ce_2_5mhz),
-	.eo_sck_t(so_pmod_cls_sck_t),
-	.eo_sck_o(so_pmod_cls_sck_o),
-	.eo_csn_t(so_pmod_cls_csn_t),
-	.eo_csn_o(so_pmod_cls_csn_o),
-	.eo_copi_t(so_pmod_cls_copi_t),
-	.eo_copi_o(so_pmod_cls_copi_o),
-	.ei_cipo(ei_pmod_cls_dq1),
-	.o_command_ready(s_cls_command_ready),
-	.i_cmd_wr_clear_display(s_cls_wr_clear_display),
-	.i_cmd_wr_text_line1(s_cls_wr_text_line1),
-	.i_cmd_wr_text_line2(s_cls_wr_text_line2),
-	.i_dat_ascii_line1(s_cls_txt_ascii_line1),
-	.i_dat_ascii_line2(s_cls_txt_ascii_line2));
+    .parm_ext_spi_clk_ratio(32),
+    .parm_wait_cyc_bits(`c_stand_spi_wait_count_bits)
+    ) u_pmod_cls_custom_driver (
+    .i_clk_20mhz(s_clk_20mhz),
+    .i_rst_20mhz(s_rst_20mhz),
+    .i_ce_2_5mhz(s_ce_2_5mhz),
+    .eo_sck_t(so_pmod_cls_sck_t),
+    .eo_sck_o(so_pmod_cls_sck_o),
+    .eo_csn_t(so_pmod_cls_csn_t),
+    .eo_csn_o(so_pmod_cls_csn_o),
+    .eo_copi_t(so_pmod_cls_copi_t),
+    .eo_copi_o(so_pmod_cls_copi_o),
+    .ei_cipo(ei_pmod_cls_dq1),
+    .o_command_ready(s_cls_command_ready),
+    .i_cmd_wr_clear_display(s_cls_wr_clear_display),
+    .i_cmd_wr_text_line1(s_cls_wr_text_line1),
+    .i_cmd_wr_text_line2(s_cls_wr_text_line2),
+    .i_dat_ascii_line1(s_cls_txt_ascii_line1),
+    .i_dat_ascii_line2(s_cls_txt_ascii_line2));
 
 assign s_cls_txt_ascii_line1 = s_hygro_txt_ascii_line1;
 assign s_cls_txt_ascii_line2 = s_hygro_txt_ascii_line2;
@@ -518,39 +518,39 @@ lcd_text_feed #(
 /* Measurement Readings to ASCII conversion */
 // TODO: create hdc1080_readings_to_ascii module
 hdc1080_readings_to_ascii #(
-	) u_hdc1080_readings_to_ascii (
+    ) u_hdc1080_readings_to_ascii (
       .i_clk(s_clk_20mhz),
       .i_srst(s_rst_20mhz),
-		.i_display_temp(s_display_temp),
-		.i_display_humid(s_display_humid),
+        .i_display_temp(s_display_temp),
+        .i_display_humid(s_display_humid),
       .i_hygro_op_mode(s_hygro_op_mode),
-		.i_hygro_display_mode(s_hygro_display_mode),
-    	.o_txt_ascii_line1(s_hygro_txt_ascii_line1),
-		.o_txt_ascii_line2(s_hygro_txt_ascii_line2)
-	);
+        .i_hygro_display_mode(s_hygro_display_mode),
+        .o_txt_ascii_line1(s_hygro_txt_ascii_line1),
+        .o_txt_ascii_line2(s_hygro_txt_ascii_line2)
+    );
 
 /* The UART line contains a space between lines 1 and 2 */
 assign s_uart_dat_ascii_line = {
-	s_hygro_txt_ascii_line1,
-	8'h20,
-	s_hygro_txt_ascii_line2,
-	8'h0D, 8'h0A};
+    s_hygro_txt_ascii_line1,
+    8'h20,
+    s_hygro_txt_ascii_line2,
+    8'h0D, 8'h0A};
 
 assign s_uart_tx_go = s_cls_wr_clear_display;
 
 /* UART driver for only the TX data */
 uart_tx_only #(
-	.BAUD(115200)
+    .BAUD(115200)
   ) u_uart_tx_only (
-	.i_clk_20mhz  (s_clk_20mhz),
-	.i_rst_20mhz  (s_rst_20mhz),
-	.i_clk_7_37mhz(s_clk_7_37mhz),
-	.i_rst_7_37mhz(s_rst_7_37mhz),
-	.eo_uart_tx   (eo_uart_tx),
-	.i_tx_data    (s_uart_txdata),
-	.i_tx_valid   (s_uart_txvalid),
-	.o_tx_ready   (s_uart_txready)
-	);
+    .i_clk_20mhz  (s_clk_20mhz),
+    .i_rst_20mhz  (s_rst_20mhz),
+    .i_clk_7_37mhz(s_clk_7_37mhz),
+    .i_rst_7_37mhz(s_rst_7_37mhz),
+    .eo_uart_tx   (eo_uart_tx),
+    .i_tx_data    (s_uart_txdata),
+    .i_tx_valid   (s_uart_txvalid),
+    .o_tx_ready   (s_uart_txready)
+    );
 
 /* FSM to feed a 34 character line upon trigger pulse to the TX ONLY driver */
 uart_tx_feed #(
