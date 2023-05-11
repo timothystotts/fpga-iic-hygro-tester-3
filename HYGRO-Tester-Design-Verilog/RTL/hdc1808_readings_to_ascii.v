@@ -72,6 +72,7 @@ integer s_temperature_f_calc_a;
 integer s_temperature_f_calc_b;
 
 integer s_humidity_p;
+integer s_humidity_p_calc_a;
 
 reg [3:0] s_val_tempc_m2;
 reg [3:0] s_val_tempc_m1;
@@ -97,11 +98,17 @@ reg [7:0] s_digit_tempf_m0;
 reg [7:0] s_digit_tempf_f0;
 reg [7:0] s_digit_tempf_f1;
 
-wire [15:0] s_val_humidp_m2;
-wire [15:0] s_val_humidp_m1;
-wire [15:0] s_val_humidp_m0;
-wire [15:0] s_val_humidp_f0;
-wire [15:0] s_val_humidp_f1;
+reg [3:0] s_val_humidp_m2;
+reg [3:0] s_val_humidp_m1;
+reg [3:0] s_val_humidp_m0;
+reg [3:0] s_val_humidp_f0;
+reg [3:0] s_val_humidp_f1;
+
+reg [7:0] s_digit_humidp_m2;
+reg [7:0] s_digit_humidp_m1;
+reg [7:0] s_digit_humidp_m0;
+reg [7:0] s_digit_humidp_f0;
+reg [7:0] s_digit_humidp_f1;
 
 wire [(16*8-1):0] s_txt_ascii_line1_no_op;
 wire [(16*8-1):0] s_txt_ascii_line1_no_display;
@@ -250,24 +257,32 @@ begin: p_calc_humidp
     per_rh /= 65536.0;
     per_rh *= 10000.0; // Conversion provided in reference manual
     */
-    s_humidity_p <= ((i_display_humid * 625) >> 12);
-end
 
-assign s_val_humidp_m2 = (s_humidity_p / 10000) % 10;
-assign s_val_humidp_m1 = (s_humidity_p / 1000) % 10;
-assign s_val_humidp_m0 = (s_humidity_p / 100) % 10;
-assign s_val_humidp_f0 = (s_humidity_p / 10) % 10;
-assign s_val_humidp_f1 = (s_humidity_p / 1) % 10;
+    s_digit_humidp_m2 <= (s_val_humidp_m2 == 4'h0) ? 8'h20 : ascii_of_hdigit(s_val_humidp_m2);
+    s_digit_humidp_m1 <= ((s_val_humidp_m2 == 4'h0) && (s_val_humidp_m1 == 4'h0)) ? 8'h20 : ascii_of_hdigit(s_val_humidp_m1);
+    s_digit_humidp_m0 <= ascii_of_hdigit(s_val_humidp_m0);
+    s_digit_humidp_f0 <= ascii_of_hdigit(s_val_humidp_f0);
+    s_digit_humidp_f1 <= ascii_of_hdigit(s_val_humidp_f1);
+
+    s_val_humidp_m2 <= (s_humidity_p / 10000) % 10;
+    s_val_humidp_m1 <= (s_humidity_p / 1000) % 10;
+    s_val_humidp_m0 <= (s_humidity_p / 100) % 10;
+    s_val_humidp_f0 <= (s_humidity_p / 10) % 10;
+    s_val_humidp_f1 <= (s_humidity_p / 1) % 10;
+
+    s_humidity_p <= s_humidity_p_calc_a >> 12;
+    s_humidity_p_calc_a <= i_display_humid * 625;
+end
 
 /* ASCII Text String of sprintf: "Humid: % 3.2f00%%" */
 assign s_txt_ascii_line2_humidp = {
     8'h48, 8'h75, 8'h6D, 8'h69, 8'h64, 8'h3A, 8'h20,
-    (s_val_humidp_m2[3-:4] == 4'h0) ? 8'h20 : ascii_of_hdigit(s_val_humidp_m2[3-:4]),
-    ((s_val_humidp_m2[3-:4] == 4'h0) && (s_val_humidp_m1[3-:4] == 4'h0)) ? 8'h20 : ascii_of_hdigit(s_val_humidp_m1[3-:4]),
-    ascii_of_hdigit(s_val_humidp_m0[3-:4]),
+    s_digit_humidp_m2,
+    s_digit_humidp_m1,
+    s_digit_humidp_m0,
     8'h2E,
-    ascii_of_hdigit(s_val_humidp_f0[3-:4]),
-    ascii_of_hdigit(s_val_humidp_f1[3-:4]),
+    s_digit_humidp_f0,
+    s_digit_humidp_f1,
     8'h30, 8'h30, 8'h25
     };
 
