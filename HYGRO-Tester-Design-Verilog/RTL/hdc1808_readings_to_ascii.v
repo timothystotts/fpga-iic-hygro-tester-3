@@ -64,20 +64,38 @@ function automatic [7:0] ascii_of_hdigit(input [3:0] bchex_val);
 endfunction
 
 integer s_temperature_c;
+integer s_temperature_c_calc_a;
+integer s_temperature_c_calc_b;
+
 integer s_temperature_f;
+integer s_temperature_f_calc_a;
+integer s_temperature_f_calc_b;
+
 integer s_humidity_p;
 
-wire [15:0] s_val_tempc_m2;
-wire [15:0] s_val_tempc_m1;
-wire [15:0] s_val_tempc_m0;
-wire [15:0] s_val_tempc_f0;
-wire [15:0] s_val_tempc_f1;
+reg [3:0] s_val_tempc_m2;
+reg [3:0] s_val_tempc_m1;
+reg [3:0] s_val_tempc_m0;
+reg [3:0] s_val_tempc_f0;
+reg [3:0] s_val_tempc_f1;
 
-wire [15:0] s_val_tempf_m2;
-wire [15:0] s_val_tempf_m1;
-wire [15:0] s_val_tempf_m0;
-wire [15:0] s_val_tempf_f0;
-wire [15:0] s_val_tempf_f1;
+reg [7:0] s_digit_tempc_m2;
+reg [7:0] s_digit_tempc_m1;
+reg [7:0] s_digit_tempc_m0;
+reg [7:0] s_digit_tempc_f0;
+reg [7:0] s_digit_tempc_f1;
+
+reg [3:0] s_val_tempf_m2;
+reg [3:0] s_val_tempf_m1;
+reg [3:0] s_val_tempf_m0;
+reg [3:0] s_val_tempf_f0;
+reg [3:0] s_val_tempf_f1;
+
+reg [7:0] s_digit_tempf_m2;
+reg [7:0] s_digit_tempf_m1;
+reg [7:0] s_digit_tempf_m0;
+reg [7:0] s_digit_tempf_f0;
+reg [7:0] s_digit_tempf_f1;
 
 wire [15:0] s_val_humidp_m2;
 wire [15:0] s_val_humidp_m1;
@@ -106,24 +124,37 @@ begin: p_calc_temp_c
         deg_c -= 40.0; // Conversion provided in reference manual
         deg_c *= 100.0;
     */
-    s_temperature_c <= (((i_display_temp - 16384) * 125) >> 9);
+
+    s_digit_tempc_m2 <= (s_val_tempc_m2 == 4'h0) ? 8'h20 :
+        ascii_of_hdigit(s_val_tempc_m2);
+    s_digit_tempc_m1 <= ((s_val_tempc_m2 == 4'h0) &&
+        (s_val_tempc_m1 == 4'h0)) ? 8'h20 :
+        ascii_of_hdigit(s_val_tempc_m1);
+    s_digit_tempc_m0 <= ascii_of_hdigit(s_val_tempc_m0);
+    s_digit_tempc_f0 <= ascii_of_hdigit(s_val_tempc_f0);
+    s_digit_tempc_f1 <= ascii_of_hdigit(s_val_tempc_f1);
+
+    s_val_tempc_m2 <= (s_temperature_c / 10000) % 10;
+    s_val_tempc_m1 <= (s_temperature_c / 1000) % 10;
+    s_val_tempc_m0 <= (s_temperature_c / 100) % 10;
+    s_val_tempc_f0 <= (s_temperature_c / 10) % 10;
+    s_val_tempc_f1 <= (s_temperature_c / 1) % 10;
+
+    s_temperature_c <= s_temperature_c_calc_b >> 9;
+    s_temperature_c_calc_b <= s_temperature_c_calc_a * 125;
+    s_temperature_c_calc_a <= i_display_temp - 16384;
 end
 
-assign s_val_tempc_m2 = (s_temperature_c / 10000) % 10;
-assign s_val_tempc_m1 = (s_temperature_c / 1000) % 10;
-assign s_val_tempc_m0 = (s_temperature_c / 100) % 10;
-assign s_val_tempc_f0 = (s_temperature_c / 10) % 10;
-assign s_val_tempc_f1 = (s_temperature_c / 1) % 10;
 
 /* ASCII Text String of sprintf: "Temp : % 3.2f00C" */
 assign s_txt_ascii_line1_tempc = {
     8'h54, 8'h65, 8'h6D, 8'h70, 8'h20, 8'h3A, 8'h20,
-    (s_val_tempc_m2[3-:4] == 4'h0) ? 8'h20 : ascii_of_hdigit(s_val_tempc_m2[3-:4]),
-    ((s_val_tempc_m2[3-:4] == 4'h0) && (s_val_tempc_m1[3-:4] == 4'h0)) ? 8'h20 : ascii_of_hdigit(s_val_tempc_m1[3-:4]),
-    ascii_of_hdigit(s_val_tempc_m0[3-:4]),
+    s_digit_tempc_m2,
+    s_digit_tempc_m1,
+    s_digit_tempc_m0,
     8'h2E,
-    ascii_of_hdigit(s_val_tempc_f0[3-:4]),
-    ascii_of_hdigit(s_val_tempc_f1[3-:4]),
+    s_digit_tempc_f0,
+    s_digit_tempc_f1,
     8'h30, 8'h30, 8'h43
     };
 
@@ -133,24 +164,37 @@ begin: p_calc_temp_f
     deg_f = deg_c * 1.8 + 32;
     */
     //s_temperature_f <= (s_temperature_c * 9 / 5 + 3200);
-    s_temperature_f <= ((225 * i_display_temp) >> 9) - 4000;
+
+    s_digit_tempf_m2 <= (s_val_tempf_m2 == 4'h0) ? 8'h20 :
+        ascii_of_hdigit(s_val_tempf_m2);
+    s_digit_tempf_m1 <= ((s_val_tempf_m2 == 4'h0) &&
+        (s_val_tempf_m1 == 4'h0)) ? 8'h20 :
+        ascii_of_hdigit(s_val_tempf_m1);
+    s_digit_tempf_m0 <= ascii_of_hdigit(s_val_tempf_m0);
+    s_digit_tempf_f0 <= ascii_of_hdigit(s_val_tempf_f0);
+    s_digit_tempf_f1 <= ascii_of_hdigit(s_val_tempf_f1);
+
+    s_val_tempf_m2 <= (s_temperature_f / 10000) % 10;
+    s_val_tempf_m1 <= (s_temperature_f / 1000) % 10;
+    s_val_tempf_m0 <= (s_temperature_f / 100) % 10;
+    s_val_tempf_f0 <= (s_temperature_f / 10) % 10;
+    s_val_tempf_f1 <= (s_temperature_f / 1) % 10;
+
+    s_temperature_f <= s_temperature_f_calc_b - 4000;
+    s_temperature_f_calc_b <= s_temperature_f_calc_a >> 9;
+    s_temperature_f_calc_a <= 225 * i_display_temp;
 end
 
-assign s_val_tempf_m2 = (s_temperature_f / 10000) % 10;
-assign s_val_tempf_m1 = (s_temperature_f / 1000) % 10;
-assign s_val_tempf_m0 = (s_temperature_f / 100) % 10;
-assign s_val_tempf_f0 = (s_temperature_f / 10) % 10;
-assign s_val_tempf_f1 = (s_temperature_f / 1) % 10;
 
 /* ASCII Text String of sprintf: "Temp : % 3.2f00F" */
 assign s_txt_ascii_line1_tempf = {
     8'h54, 8'h65, 8'h6D, 8'h70, 8'h20, 8'h3A, 8'h20,
-    (s_val_tempf_m2[3-:4] == 4'h0) ? 8'h20 : ascii_of_hdigit(s_val_tempf_m2[3-:4]),
-    ((s_val_tempf_m2[3-:4] == 4'h0) && (s_val_tempf_m1[3-:4] == 4'h0)) ? 8'h20 : ascii_of_hdigit(s_val_tempf_m1[3-:4]),
-    ascii_of_hdigit(s_val_tempf_m0[3-:4]),
+    s_digit_tempf_m2,
+    s_digit_tempf_m1,
+    s_digit_tempf_m0,
     8'h2E,
-    ascii_of_hdigit(s_val_tempf_f0[3-:4]),
-    ascii_of_hdigit(s_val_tempf_f1[3-:4]),
+    s_digit_tempf_f0,
+    s_digit_tempf_f1,
     8'h30, 8'h30, 8'h46
     };
 
