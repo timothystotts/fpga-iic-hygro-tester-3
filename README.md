@@ -23,7 +23,7 @@ example is intended as a FPGA design example and not an ASCI design example.
 Notes:
 - The MicroBlaze example followed this tutorial as a starting point:
 - [https://digilent.com/reference/learn/programmable-logic/tutorials/arty-getting-started-with-microblaze-servers/start](https://digilent.com/reference/learn/programmable-logic/tutorials/arty-getting-started-with-microblaze-servers/start)
-- Note that the MicroBlaze example requires Xilinx Vivado 2021.2. The DDR MIG is driven by two MMCM clocks in a way that is possibily incompatible with newer versions of Vivado. Newer versions of Vivado may require a revised block design to achieve a functional design.
+- Note that the MicroBlaze example requires Xilinx Vivado 2021.2. The DDR MIG is driven by two MMCM clocks in a way that is possibly incompatible with newer versions of Vivado. Newer versions of Vivado may require a revised block design to achieve a functional design.
 
 ## Description
 A small FPGA and APSoC project of different implementations for testing Temperature and Relative Humidity
